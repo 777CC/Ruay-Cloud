@@ -1,0 +1,117 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Metadata": {
+    "AWS::CloudFormation::Designer": {
+      "23b7c175-226b-414d-b9a2-2cf243a51f3c": {
+        "size": {
+          "width": 60,
+          "height": 60
+        },
+        "position": {
+          "x": 470,
+          "y": 70
+        },
+        "z": 0,
+        "embeds": [],
+        "isrelatedto": [
+          "5bc8feb0-9fcf-4624-9af9-aa249923d778"
+        ]
+      },
+      "5bc8feb0-9fcf-4624-9af9-aa249923d778": {
+        "size": {
+          "width": 60,
+          "height": 60
+        },
+        "position": {
+          "x": 360,
+          "y": 70
+        },
+        "z": 0,
+        "embeds": []
+      }
+    }
+  },
+  "Resources": {
+    "LF4IA5Z": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Environment": {
+          "Variables": {
+            "testenv": "helloenv"
+          }
+        },
+        "Code": {
+          "ZipFile": {
+            "Fn::Join": [
+              "",
+              [
+                "'use strict';",
+                "exports.handler = (event, context, callback) =>{",
+                "callback(null,process.env.testenv);",
+                "};"
+              ]
+            ]
+          }
+        },
+        "Description": "generic hanlder",
+        "Handler": "index.handler",
+        "MemorySize": 128,
+        "Runtime": "nodejs4.3",
+        "Timeout": 30,
+        "Role": {
+          "Fn::GetAtt": [
+            "ManualRole",
+            "Arn"
+          ]
+        }
+      },
+      "Metadata": {
+        "AWS::CloudFormation::Designer": {
+          "id": "23b7c175-226b-414d-b9a2-2cf243a51f3c"
+        }
+      }
+    },
+    "ManualRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        },
+        "Path": "/",
+        "Policies": [
+          {
+            "PolicyName": "logs",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:*"
+                  ],
+                  "Resource": "arn:aws:logs:*:*:*"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "Metadata": {
+        "AWS::CloudFormation::Designer": {
+          "id": "5bc8feb0-9fcf-4624-9af9-aa249923d778"
+        }
+      }
+    }
+  }
+}
