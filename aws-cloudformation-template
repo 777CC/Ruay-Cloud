@@ -1,0 +1,348 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "AWS in Action: Lambda",
+  "Parameters": {
+    "ImageS3Bucket": {
+      "Description": "The name of the S3 bucket that is created for images.",
+      "Type": "String"
+    },
+    "LambdaS3Bucket": {
+      "Description": "The name of the S3 bucket that contains the source code of your Lambda function.",
+      "Type": "String"
+    },
+    "LambdaS3Key": {
+      "Description": "The location and name of your source code .zip file.",
+      "Type": "String",
+      "Default": "lambda.zip"
+    }
+  },
+  "Resources": {
+    "OriginalS3Bucket": {
+      "Type": "AWS::S3::Bucket",
+      "Properties": {
+        "BucketName": {
+          "Fn::Join": [
+            "-",
+            [
+              {
+                "Ref": "ImageS3Bucket"
+              },
+              "original"
+            ]
+          ]
+        },
+        "NotificationConfiguration": {
+          "LambdaConfigurations": [
+            {
+              "Event": "s3:ObjectCreated:*",
+              "Function": {
+                "Fn::GetAtt": [
+                  "Lambda",
+                  "Arn"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "Metadata": {
+        "AWS::CloudFormation::Designer": {
+          "id": "1cab0599-bd99-4940-9f1d-56ebed473c79"
+        }
+      }
+    },
+    "ResizedS3Bucket": {
+      "Type": "AWS::S3::Bucket",
+      "Properties": {
+        "BucketName": {
+          "Fn::Join": [
+            "-",
+            [
+              {
+                "Ref": "ImageS3Bucket"
+              },
+              "resized"
+            ]
+          ]
+        }
+      },
+      "Metadata": {
+        "AWS::CloudFormation::Designer": {
+          "id": "5fa6ad97-c392-44cb-b065-b468f6a67388"
+        }
+      }
+    },
+    "LambdaRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        },
+        "Path": "/",
+        "Policies": [
+          {
+            "PolicyName": "logs",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:*"
+                  ],
+                  "Resource": "arn:aws:logs:*:*:*"
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "s3-original",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "s3:GetObject"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Join": [
+                        "",
+                        [
+                          "arn:aws:s3:::",
+                          {
+                            "Ref": "ImageS3Bucket"
+                          },
+                          "-original/*"
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "s3-resized",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "s3:PutObject"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Join": [
+                        "",
+                        [
+                          "arn:aws:s3:::",
+                          {
+                            "Ref": "ImageS3Bucket"
+                          },
+                          "-resized/*"
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "Metadata": {
+        "AWS::CloudFormation::Designer": {
+          "id": "28c14d46-0d64-4f48-a5fb-95f4be7d07aa"
+        }
+      }
+    },
+    "Lambda": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "LambdaS3Bucket"
+          },
+          "S3Key": {
+            "Ref": "LambdaS3Key"
+          }
+        },
+        "Description": "generic hanlder",
+        "Handler": "index.handler",
+        "MemorySize": 256,
+        "Role": {
+          "Fn::GetAtt": [
+            "LambdaRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs",
+        "Timeout": 30
+      },
+      "Metadata": {
+        "AWS::CloudFormation::Designer": {
+          "id": "447b5fe5-db09-432a-bba3-af56c569b691"
+        }
+      }
+    },
+    "LambdaPermission": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:invokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "Lambda",
+            "Arn"
+          ]
+        },
+        "Principal": "s3.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:aws:s3:::",
+              {
+                "Ref": "ImageS3Bucket"
+              },
+              "-original"
+            ]
+          ]
+        }
+      },
+      "Metadata": {
+        "AWS::CloudFormation::Designer": {
+          "id": "958ab711-daed-4ced-ac6f-770a66858c9b"
+        }
+      }
+    },
+    "ManualResize": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "LambdaS3Bucket"
+          },
+          "S3Key": "lambda0.zip"
+        },
+        "Description": "generic hanlder",
+        "Handler": "index.handler",
+        "MemorySize": 256,
+        "Role": {
+          "Fn::GetAtt": [
+            "LambdaRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs",
+        "Timeout": 30
+      },
+      "Metadata": {
+        "AWS::CloudFormation::Designer": {
+          "id": "f67bb835-6b8b-4cae-bc2d-dd02965bf2c5"
+        }
+      }
+    }
+  },
+  "Metadata": {
+    "AWS::CloudFormation::Designer": {
+      "28c14d46-0d64-4f48-a5fb-95f4be7d07aa": {
+        "size": {
+          "width": 60,
+          "height": 60
+        },
+        "position": {
+          "x": 60,
+          "y": 100
+        },
+        "z": 1,
+        "embeds": []
+      },
+      "447b5fe5-db09-432a-bba3-af56c569b691": {
+        "size": {
+          "width": 60,
+          "height": 60
+        },
+        "position": {
+          "x": 180,
+          "y": 90
+        },
+        "z": 1,
+        "embeds": [],
+        "isrelatedto": [
+          "28c14d46-0d64-4f48-a5fb-95f4be7d07aa"
+        ]
+      },
+      "958ab711-daed-4ced-ac6f-770a66858c9b": {
+        "size": {
+          "width": 60,
+          "height": 60
+        },
+        "position": {
+          "x": 60,
+          "y": 210
+        },
+        "z": 1,
+        "embeds": [],
+        "isassociatedwith": [
+          "447b5fe5-db09-432a-bba3-af56c569b691"
+        ]
+      },
+      "5fa6ad97-c392-44cb-b065-b468f6a67388": {
+        "size": {
+          "width": 60,
+          "height": 60
+        },
+        "position": {
+          "x": 180,
+          "y": 210
+        },
+        "z": 1,
+        "embeds": []
+      },
+      "1cab0599-bd99-4940-9f1d-56ebed473c79": {
+        "size": {
+          "width": 60,
+          "height": 60
+        },
+        "position": {
+          "x": 300,
+          "y": 90
+        },
+        "z": 1,
+        "embeds": [],
+        "isrelatedto": [
+          "447b5fe5-db09-432a-bba3-af56c569b691"
+        ]
+      },
+      "f67bb835-6b8b-4cae-bc2d-dd02965bf2c5": {
+        "size": {
+          "width": 60,
+          "height": 60
+        },
+        "position": {
+          "x": -50,
+          "y": 190
+        },
+        "z": 0,
+        "embeds": [],
+        "isrelatedto": [
+          "28c14d46-0d64-4f48-a5fb-95f4be7d07aa"
+        ]
+      }
+    }
+  }
+}
