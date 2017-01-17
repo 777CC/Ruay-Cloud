@@ -6,7 +6,7 @@ const dynamo = new doc.DynamoDB();
 const async = require('async');
 
 
-const userDataKeys = ["email","tel","gender","firstName", "lastName", "interest","birthday"];
+const userDataKeys = ["tel","gender","firstName", "lastName", "interests","birthday"];
 
 function setValue(dataset,valueName,newValue){
     if (valueName in dataset) {
@@ -64,7 +64,7 @@ exports.handler = (event, context, callback) => {
                 },
                     //get user's items from dynamodb
                     function(cb) {
-                    getUserData(cb,modifiedEvent);
+                    getUserInfo(cb,modifiedEvent);
                 }
                 ], function(err) { //This function gets called after the two tasks have called their "task callbacks"
                     if (err) return console.log(err);
@@ -127,7 +127,7 @@ function getUserReward(callback,modifiedEvent){
                     });
 }
 
-function getUserData(callback,modifiedEvent){
+function getUserInfo(callback,modifiedEvent){
         dynamo.getItem(
                     {
                         "TableName": process.env.UsersTableName,
@@ -137,12 +137,13 @@ function getUserData(callback,modifiedEvent){
                         if(err){
                             console.log("Error : " +  JSON.stringify(err));
                         }
+                        //length === 0 for not registered user.
                         else if(Object.keys(data).length === 0){
                             console.log("addUser");
                             addUser(callback,modifiedEvent);
                         }
                         else{
-                            updateUserProfile(callback,data,modifiedEvent);
+                            updateUserInfo(callback,data,modifiedEvent);
                         }
                     });
 }
@@ -165,7 +166,7 @@ function nextDailyRewardTime(){
 function addDataset(userData,datasetRecords){
     userDataKeys.forEach(function(item) {
         if (item in datasetRecords) {
-            if(item === "interest")
+            if(item === "interests")
             {
                 var interests = datasetRecords[item].newValue.split('#').filter(function(el) {return el.length !== 0});
                 userData[item] = dynamo.Set(interests, "S");
@@ -202,7 +203,7 @@ function addUser(callback,modifiedEvent){
                     });
 }
 
-function updateUserProfile(callback,oldData,modifiedEvent){
+function updateUserInfo(callback,oldData,modifiedEvent){
     var userParams = {
         TableName:process.env.UsersTableName,
         Key: { "id" :modifiedEvent.identityId}
@@ -225,12 +226,10 @@ function updateUserProfile(callback,oldData,modifiedEvent){
             if(modifiedEvent.datasetRecords[key].op === 'replace'){
                 isUpdate = true;
                 
-                if(key === 'interest'){
-                    UpdateExpression += "interest = :interest, ";
+                if(key === 'interests'){
+                    UpdateExpression += "interests = :interests, ";
                     var interests = modifiedEvent.datasetRecords[key].newValue.split('#').filter(function(el) {return el.length !== 0});
-                    userParams.ExpressionAttributeValues = {
-                        ":interest":dynamo.Set(interests, "S")
-                    };
+                    userParams.ExpressionAttributeValues[":interests"] = dynamo.Set(interests, "S");
                 }
                 else{
                     UpdateExpression += key + " = :" + key + ", ";
