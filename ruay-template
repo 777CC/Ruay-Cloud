@@ -5,26 +5,56 @@
     "ImageS3Bucket": {
       "Description": "The name of the S3 bucket that is created for images.",
       "Type": "String",
-      "Default": "images3bucket-original"
+      "Default": "images3bucket"
     },
-    "LambdaCodeS3Bucket": {
+    "CodeS3Bucket": {
       "Description": "The name of the S3 bucket that contains the source code of your Lambda function.",
       "Type": "String"
     },
-    "AutoResizeZipName": {
-      "Description": "The location and name of your source code .zip file.",
+    "CodeAutoResize": {
+      "Description": "key Function .zip file.",
       "Type": "String",
       "Default": "AutoResize.zip"
     },
-    "ManualResizeZipName": {
-      "Description": "The name of the S3 bucket that contains the source code of your ManualResizeLambda function.",
+    "CodeManualResize": {
+      "Description": "key ManualResize function .zip file.",
       "Type": "String",
       "Default": "ManualResize.zip"
+    },
+    "CodeSync": {
+      "Description": "key GetData function .zip file.",
+      "Type": "String",
+      "Default": "Sync.zip"
     },
     "ConfigTableName": {
       "Description": "The name of  table in Dynamodb which is config table.",
       "Type": "String",
       "Default": "Config"
+    },
+    "UsersTableName": {
+      "Description": "The name of  table in Dynamodb which is Users table.",
+      "Type": "String",
+      "Default": "Users"
+    },
+    "TicketsTableName": {
+      "Description": "The name of  table in Dynamodb which is Tickets table.",
+      "Type": "String",
+      "Default": "Tickets"
+    },
+    "ShopTableName": {
+      "Description": "The name of  table in Dynamodb which is Shop table.",
+      "Type": "String",
+      "Default": "Shop"
+    },
+    "ItemsTableName": {
+      "Description": "The name of  table in Dynamodb which is Items table.",
+      "Type": "String",
+      "Default": "Items"
+    },
+    "RewardsTableName": {
+      "Description": "The name of  table in Dynamodb which is Items table.",
+      "Type": "String",
+      "Default": "Rewards"
     }
   },
   "Resources": {
@@ -48,7 +78,7 @@
               "Event": "s3:ObjectCreated:*",
               "Function": {
                 "Fn::GetAtt": [
-                  "Lambda",
+                  "AutoResize",
                   "Arn"
                 ]
               }
@@ -83,74 +113,45 @@
         }
       }
     },
-    "Lambda": {
-      "Type": "AWS::Lambda::Function",
-      "Properties": {
-        "Code": {
-          "S3Bucket": {
-            "Ref": "LambdaCodeS3Bucket"
-          },
-          "S3Key": {
-            "Ref": "AutoResizeZipName"
-          }
-        },
-        "Description": "generic hanlder",
-        "Handler": "index.handler",
-        "MemorySize": 256,
-        "Role": {
-          "Fn::GetAtt": [
-            "AutoRole",
-            "Arn"
-          ]
-        },
-        "Runtime": "nodejs",
-        "Timeout": 30
-      },
-      "Metadata": {
-        "AWS::CloudFormation::Designer": {
-          "id": "447b5fe5-db09-432a-bba3-af56c569b691"
-        }
-      }
-    },
-    "LambdaPermission": {
-      "Type": "AWS::Lambda::Permission",
-      "Properties": {
-        "Action": "lambda:invokeFunction",
-        "FunctionName": {
-          "Fn::GetAtt": [
-            "Lambda",
-            "Arn"
-          ]
-        },
-        "Principal": "s3.amazonaws.com",
-        "SourceArn": {
-          "Fn::Join": [
-            "",
-            [
-              "arn:aws:s3:::",
-              {
-                "Ref": "ImageS3Bucket"
-              },
-              "-original"
-            ]
-          ]
-        }
-      },
-      "Metadata": {
-        "AWS::CloudFormation::Designer": {
-          "id": "958ab711-daed-4ced-ac6f-770a66858c9b"
-        }
-      }
-    },
     "ManualResize": {
       "Type": "AWS::Lambda::Function",
       "Properties": {
+        "FunctionName": "ManualResize",
+        "Environment": {
+          "Variables": {
+            "ConfigTableName": {
+              "Ref": "ConfigTableName"
+            },
+            "ImageOriginalBucketName": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "ImageS3Bucket"
+                  },
+                  "-original"
+                ]
+              ]
+            },
+            "ImageResizedBucketName": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "ImageS3Bucket"
+                  },
+                  "-resized"
+                ]
+              ]
+            }
+          }
+        },
         "Code": {
           "S3Bucket": {
-            "Ref": "LambdaCodeS3Bucket"
+            "Ref": "CodeS3Bucket"
           },
           "S3Key": {
-            "Ref": "ManualResizeZipName"
+            "Ref": "CodeManualResize"
           }
         },
         "Description": "generic hanlder",
@@ -162,7 +163,7 @@
             "Arn"
           ]
         },
-        "Runtime": "nodejs",
+        "Runtime": "nodejs4.3",
         "Timeout": 30
       },
       "Metadata": {
@@ -461,13 +462,718 @@
           "Ref": "ConfigTableName"
         },
         "ProvisionedThroughput": {
-          "ReadCapacityUnits": "5",
-          "WriteCapacityUnits": "5"
+          "ReadCapacityUnits": "1",
+          "WriteCapacityUnits": "1"
         }
       },
       "Metadata": {
         "AWS::CloudFormation::Designer": {
           "id": "e2f3dd43-b448-4673-8d3d-53466960f182"
+        }
+      }
+    },
+    "AutoResizePermission": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:invokeFunction",
+        "FunctionName": {
+          "Ref": "AutoResize"
+        },
+        "Principal": "s3.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:aws:s3:::",
+              {
+                "Ref": "ImageS3Bucket"
+              },
+              "-original"
+            ]
+          ]
+        }
+      },
+      "Metadata": {
+        "AWS::CloudFormation::Designer": {
+          "id": "958ab711-daed-4ced-ac6f-770a66858c9b"
+        }
+      }
+    },
+    "AutoResize": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "FunctionName": "AutoResize",
+        "Environment": {
+          "Variables": {
+            "ConfigTableName": {
+              "Ref": "ConfigTableName"
+            }
+          }
+        },
+        "Code": {
+          "S3Bucket": {
+            "Ref": "CodeS3Bucket"
+          },
+          "S3Key": {
+            "Ref": "CodeAutoResize"
+          }
+        },
+        "Description": "generic hanlder",
+        "Handler": "index.handler",
+        "MemorySize": 256,
+        "Role": {
+          "Fn::GetAtt": [
+            "AutoRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs4.3",
+        "Timeout": 30
+      },
+      "Metadata": {
+        "AWS::CloudFormation::Designer": {
+          "id": "447b5fe5-db09-432a-bba3-af56c569b691"
+        }
+      }
+    },
+    "BuyTicket": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "FunctionName": "BuyTicket",
+        "Code": {
+          "S3Bucket": {
+            "Ref": "CodeS3Bucket"
+          },
+          "S3Key": {
+            "Ref": "CodeManualResize"
+          }
+        },
+        "Description": "generic hanlder",
+        "Handler": "index.handler",
+        "MemorySize": 128,
+        "Role": {
+          "Fn::GetAtt": [
+            "BuyTicketRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs4.3",
+        "Timeout": 30
+      },
+      "Metadata": {
+        "AWS::CloudFormation::Designer": {
+          "id": "cc9d3bd3-e63e-4742-b363-2ea110ce1630"
+        }
+      }
+    },
+    "BuyTicketRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        },
+        "Path": "/",
+        "Policies": [
+          {
+            "PolicyName": "logs",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:*"
+                  ],
+                  "Resource": "arn:aws:logs:*:*:*"
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "GetUserfromTable",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "dynamodb:GetItem",
+                    "dynamodb:UpdateItem"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Join": [
+                        "",
+                        [
+                          "arn:aws:dynamodb",
+                          ":",
+                          {
+                            "Ref": "AWS::Region"
+                          },
+                          ":",
+                          {
+                            "Ref": "AWS::AccountId"
+                          },
+                          ":",
+                          "table/",
+                          {
+                            "Ref": "UsersTableName"
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "GetShopfromTable",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "dynamodb:GetItem"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Join": [
+                        "",
+                        [
+                          "arn:aws:dynamodb",
+                          ":",
+                          {
+                            "Ref": "AWS::Region"
+                          },
+                          ":",
+                          {
+                            "Ref": "AWS::AccountId"
+                          },
+                          ":",
+                          "table/",
+                          {
+                            "Ref": "ShopTableName"
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "GetTicketfromTable",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "dynamodb:GetItem",
+                    "dynamodb:PutItem"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Join": [
+                        "",
+                        [
+                          "arn:aws:dynamodb",
+                          ":",
+                          {
+                            "Ref": "AWS::Region"
+                          },
+                          ":",
+                          {
+                            "Ref": "AWS::AccountId"
+                          },
+                          ":",
+                          "table/",
+                          {
+                            "Ref": "TicketsTableName"
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "Metadata": {
+        "AWS::CloudFormation::Designer": {
+          "id": "698c3a41-29be-46e4-831f-1be5b855a623"
+        }
+      }
+    },
+    "Shop": {
+      "Type": "AWS::DynamoDB::Table",
+      "Properties": {
+        "TableName": {
+          "Ref": "ShopTableName"
+        },
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "date",
+            "AttributeType": "S"
+          }
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "date",
+            "KeyType": "HASH"
+          }
+        ],
+        "ProvisionedThroughput": {
+          "ReadCapacityUnits": "1",
+          "WriteCapacityUnits": "1"
+        }
+      },
+      "Metadata": {
+        "AWS::CloudFormation::Designer": {
+          "id": "46ae299a-5895-4011-a466-e5bfca64896d"
+        }
+      }
+    },
+    "CognitoSynctrigger": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "FunctionName": "CognitoSynctrigger",
+        "Code": {
+          "S3Bucket": {
+            "Ref": "CodeS3Bucket"
+          },
+          "S3Key": {
+            "Ref": "CodeSync"
+          }
+        },
+        "Environment": {
+          "Variables": {
+            "TicketsTableName": {
+              "Ref": "TicketsTableName"
+            },
+            "RewardsTableName": {
+              "Ref": "RewardsTableName"
+            },
+            "UsersTableName": {
+              "Ref": "UsersTableName"
+            }
+          }
+        },
+        "Description": "generic hanlder",
+        "Handler": "index.handler",
+        "MemorySize": 128,
+        "Role": {
+          "Fn::GetAtt": [
+            "CognitoSynctriggerRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs4.3",
+        "Timeout": 30
+      },
+      "Metadata": {
+        "AWS::CloudFormation::Designer": {
+          "id": "57649d58-52f3-46d9-bdb4-9d256f72f7fa"
+        }
+      }
+    },
+    "CognitoSynctriggerRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        },
+        "Path": "/",
+        "Policies": [
+          {
+            "PolicyName": "logs",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:*"
+                  ],
+                  "Resource": "arn:aws:logs:*:*:*"
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "GetUserfromTable",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "dynamodb:GetItem",
+                    "dynamodb:PutItem",
+                    "dynamodb:UpdateItem"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Join": [
+                        "",
+                        [
+                          "arn:aws:dynamodb",
+                          ":",
+                          {
+                            "Ref": "AWS::Region"
+                          },
+                          ":",
+                          {
+                            "Ref": "AWS::AccountId"
+                          },
+                          ":",
+                          "table/",
+                          {
+                            "Ref": "UsersTableName"
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "GetShopfromTable",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "dynamodb:GetItem"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Join": [
+                        "",
+                        [
+                          "arn:aws:dynamodb",
+                          ":",
+                          {
+                            "Ref": "AWS::Region"
+                          },
+                          ":",
+                          {
+                            "Ref": "AWS::AccountId"
+                          },
+                          ":",
+                          "table/",
+                          {
+                            "Ref": "ShopTableName"
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "GetTicketfromTable",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "dynamodb:Query"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Join": [
+                        "",
+                        [
+                          "arn:aws:dynamodb",
+                          ":",
+                          {
+                            "Ref": "AWS::Region"
+                          },
+                          ":",
+                          {
+                            "Ref": "AWS::AccountId"
+                          },
+                          ":",
+                          "table/",
+                          {
+                            "Ref": "TicketsTableName"
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "GetRewardfromTable",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "dynamodb:Query"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Join": [
+                        "",
+                        [
+                          "arn:aws:dynamodb",
+                          ":",
+                          {
+                            "Ref": "AWS::Region"
+                          },
+                          ":",
+                          {
+                            "Ref": "AWS::AccountId"
+                          },
+                          ":",
+                          "table/",
+                          {
+                            "Ref": "RewardsTableName"
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "Metadata": {
+        "AWS::CloudFormation::Designer": {
+          "id": "87e2afad-1a2e-4dd0-8146-252434ab7202"
+        }
+      }
+    },
+    "Rewards": {
+      "Type": "AWS::DynamoDB::Table",
+      "Properties": {
+        "TableName": {
+          "Ref": "RewardsTableName"
+        },
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "ownerId",
+            "AttributeType": "S"
+          },
+          {
+            "AttributeName": "createdOn",
+            "AttributeType": "N"
+          },
+          {
+            "AttributeName": "courierId",
+            "AttributeType": "S"
+          },
+          {
+            "AttributeName": "shippingStatus",
+            "AttributeType": "N"
+          }
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "ownerId",
+            "KeyType": "HASH"
+          },
+          {
+            "AttributeName": "createdOn",
+            "KeyType": "RANGE"
+          }
+        ],
+        "ProvisionedThroughput": {
+          "ReadCapacityUnits": "1",
+          "WriteCapacityUnits": "1"
+        },
+        "GlobalSecondaryIndexes": [
+          {
+            "IndexName": "courierId-shippingStatus-index",
+            "KeySchema": [
+              {
+                "AttributeName": "courierId",
+                "KeyType": "HASH"
+              },
+              {
+                "AttributeName": "shippingStatus",
+                "KeyType": "RANGE"
+              }
+            ],
+            "Projection": {
+              "ProjectionType": "ALL"
+            },
+            "ProvisionedThroughput": {
+              "ReadCapacityUnits": "1",
+              "WriteCapacityUnits": "1"
+            }
+          }
+        ]
+      },
+      "Metadata": {
+        "AWS::CloudFormation::Designer": {
+          "id": "48673dcf-0f04-46d9-96e4-27e04aca73b8"
+        }
+      }
+    },
+    "Tickets": {
+      "Type": "AWS::DynamoDB::Table",
+      "Properties": {
+        "TableName": {
+          "Ref": "TicketsTableName"
+        },
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "ownerId",
+            "AttributeType": "S"
+          },
+          {
+            "AttributeName": "createdOn",
+            "AttributeType": "N"
+          },
+          {
+            "AttributeName": "roundId",
+            "AttributeType": "S"
+          },
+          {
+            "AttributeName": "reserveNumber",
+            "AttributeType": "N"
+          }
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "ownerId",
+            "KeyType": "HASH"
+          },
+          {
+            "AttributeName": "createdOn",
+            "KeyType": "RANGE"
+          }
+        ],
+        "ProvisionedThroughput": {
+          "ReadCapacityUnits": "1",
+          "WriteCapacityUnits": "1"
+        },
+        "GlobalSecondaryIndexes": [
+          {
+            "IndexName": "roundId-reserveNumber-index",
+            "KeySchema": [
+              {
+                "AttributeName": "roundId",
+                "KeyType": "HASH"
+              },
+              {
+                "AttributeName": "reserveNumber",
+                "KeyType": "RANGE"
+              }
+            ],
+            "Projection": {
+              "ProjectionType": "ALL"
+            },
+            "ProvisionedThroughput": {
+              "ReadCapacityUnits": "1",
+              "WriteCapacityUnits": "1"
+            }
+          }
+        ]
+      },
+      "Metadata": {
+        "AWS::CloudFormation::Designer": {
+          "id": "8382f45f-c45b-4b4f-a8e6-c62d06e1a860"
+        }
+      }
+    },
+    "Users": {
+      "Type": "AWS::DynamoDB::Table",
+      "Properties": {
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "id",
+            "AttributeType": "S"
+          }
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "id",
+            "KeyType": "HASH"
+          }
+        ],
+        "TableName": {
+          "Ref": "UsersTableName"
+        },
+        "ProvisionedThroughput": {
+          "ReadCapacityUnits": "1",
+          "WriteCapacityUnits": "1"
+        }
+      },
+      "Metadata": {
+        "AWS::CloudFormation::Designer": {
+          "id": "6423a6eb-5e0a-4438-bdf2-ab89e94b5f4c"
+        }
+      }
+    },
+    "Items": {
+      "Type": "AWS::DynamoDB::Table",
+      "Properties": {
+        "TableName": {
+          "Ref": "ItemsTableName"
+        },
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "id",
+            "AttributeType": "S"
+          }
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "id",
+            "KeyType": "HASH"
+          }
+        ],
+        "ProvisionedThroughput": {
+          "ReadCapacityUnits": "1",
+          "WriteCapacityUnits": "1"
+        }
+      },
+      "Metadata": {
+        "AWS::CloudFormation::Designer": {
+          "id": "746e5893-3c86-40e8-92c8-95eebc2778be"
         }
       }
     }
@@ -480,8 +1186,8 @@
           "height": 60
         },
         "position": {
-          "x": 180,
-          "y": -10
+          "x": 60,
+          "y": -20
         },
         "z": 1,
         "embeds": [],
@@ -496,7 +1202,7 @@
         },
         "position": {
           "x": 180,
-          "y": 90
+          "y": -20
         },
         "z": 1,
         "embeds": [],
@@ -510,7 +1216,7 @@
           "height": 60
         },
         "position": {
-          "x": 70,
+          "x": 180,
           "y": 90
         },
         "z": 1,
@@ -525,8 +1231,8 @@
           "height": 60
         },
         "position": {
-          "x": 180,
-          "y": 210
+          "x": 300,
+          "y": 90
         },
         "z": 1,
         "embeds": []
@@ -538,7 +1244,7 @@
         },
         "position": {
           "x": 300,
-          "y": 90
+          "y": -20
         },
         "z": 1,
         "embeds": [],
@@ -552,10 +1258,10 @@
           "height": 60
         },
         "position": {
-          "x": -40,
-          "y": 90
+          "x": 180,
+          "y": 200
         },
-        "z": 0,
+        "z": 1,
         "embeds": [],
         "isrelatedto": [
           "28c14d46-0d64-4f48-a5fb-95f4be7d07aa",
@@ -568,8 +1274,8 @@
           "height": 60
         },
         "position": {
-          "x": -40,
-          "y": -10
+          "x": 50,
+          "y": 190
         },
         "z": 1,
         "embeds": [],
@@ -583,10 +1289,133 @@
           "height": 60
         },
         "position": {
-          "x": 70,
-          "y": -10
+          "x": -80,
+          "y": 590
         },
-        "z": 0,
+        "z": 1,
+        "embeds": []
+      },
+      "6423a6eb-5e0a-4438-bdf2-ab89e94b5f4c": {
+        "size": {
+          "width": 60,
+          "height": 60
+        },
+        "position": {
+          "x": -70,
+          "y": -30
+        },
+        "z": 1,
+        "embeds": []
+      },
+      "57649d58-52f3-46d9-bdb4-9d256f72f7fa": {
+        "size": {
+          "width": 60,
+          "height": 60
+        },
+        "position": {
+          "x": 190,
+          "y": 350
+        },
+        "z": 1,
+        "embeds": [],
+        "isrelatedto": [
+          "ca1f96a9-87e2-4547-8db6-9a2a91f82276",
+          "87e2afad-1a2e-4dd0-8146-252434ab7202"
+        ]
+      },
+      "cc9d3bd3-e63e-4742-b363-2ea110ce1630": {
+        "size": {
+          "width": 60,
+          "height": 60
+        },
+        "position": {
+          "x": 190,
+          "y": 490
+        },
+        "z": 1,
+        "embeds": [],
+        "isrelatedto": [
+          "ca1f96a9-87e2-4547-8db6-9a2a91f82276",
+          "698c3a41-29be-46e4-831f-1be5b855a623"
+        ]
+      },
+      "87e2afad-1a2e-4dd0-8146-252434ab7202": {
+        "size": {
+          "width": 60,
+          "height": 60
+        },
+        "position": {
+          "x": 60,
+          "y": 350
+        },
+        "z": 1,
+        "embeds": [],
+        "isrelatedto": [
+          "e2f3dd43-b448-4673-8d3d-53466960f182",
+          "8382f45f-c45b-4b4f-a8e6-c62d06e1a860"
+        ]
+      },
+      "698c3a41-29be-46e4-831f-1be5b855a623": {
+        "size": {
+          "width": 60,
+          "height": 60
+        },
+        "position": {
+          "x": 70,
+          "y": 490
+        },
+        "z": 1,
+        "embeds": [],
+        "isrelatedto": [
+          "e2f3dd43-b448-4673-8d3d-53466960f182"
+        ]
+      },
+      "8382f45f-c45b-4b4f-a8e6-c62d06e1a860": {
+        "size": {
+          "width": 60,
+          "height": 60
+        },
+        "position": {
+          "x": -70,
+          "y": 210
+        },
+        "z": 1,
+        "embeds": []
+      },
+      "46ae299a-5895-4011-a466-e5bfca64896d": {
+        "size": {
+          "width": 60,
+          "height": 60
+        },
+        "position": {
+          "x": -70,
+          "y": 90
+        },
+        "z": 1,
+        "embeds": []
+      },
+      "48673dcf-0f04-46d9-96e4-27e04aca73b8": {
+        "size": {
+          "width": 60,
+          "height": 60
+        },
+        "position": {
+          "x": -80,
+          "y": 490
+        },
+        "z": 1,
+        "embeds": []
+      },
+      "746e5893-3c86-40e8-92c8-95eebc2778be": {
+        "size": {
+          "width": 60,
+          "height": 60
+        },
+        "position": {
+          "x": -80,
+          "y": 340
+        },
+        "z": 1,
         "embeds": []
       }
     }
