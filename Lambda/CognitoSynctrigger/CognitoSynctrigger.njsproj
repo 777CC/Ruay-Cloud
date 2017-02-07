@@ -3,12 +3,8 @@
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
-    <Name>BuyTicket</Name>
-    <RootNamespace>BuyTicket</RootNamespace>
-    <EnableTypeScript>true</EnableTypeScript>
-    <TypeScriptSourceMap>true</TypeScriptSourceMap>
-    <TypeScriptModuleKind>CommonJS</TypeScriptModuleKind>
-    <StartupFile>index.js</StartupFile>
+    <Name>CognitoSynctrigger</Name>
+    <RootNamespace>CognitoSynctrigger</RootNamespace>
   </PropertyGroup>
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -37,39 +33,6 @@
   </PropertyGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="bin\" />
-    <Folder Include="obj\" />
-    <Folder Include="obj\Debug\" />
-    <Folder Include="Scripts\" />
-    <Folder Include="Scripts\typings\" />
-    <Folder Include="Scripts\typings\node\" />
-    <Folder Include="typings\" />
-    <Folder Include="typings\globals\" />
-    <Folder Include="typings\globals\async\" />
-    <Folder Include="typings\globals\gm\" />
-    <Folder Include="typings\globals\node\" />
-  </ItemGroup>
-  <ItemGroup>
-    <TypeScriptCompile Include="Scripts\typings\node\node.d.ts" />
-    <TypeScriptCompile Include="typings\globals\async\index.d.ts" />
-    <TypeScriptCompile Include="typings\globals\gm\index.d.ts" />
-    <TypeScriptCompile Include="typings\globals\node\index.d.ts" />
-    <TypeScriptCompile Include="typings\index.d.ts" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="bin\Microsoft.NodejsTools.WebRole.dll" />
-    <Content Include="config.json" />
-    <Content Include="obj\Debug\testauto.njsproj.FileListAbsolute.txt" />
-    <Content Include="obj\Debug\testauto.njsprojResolveAssemblyReference.cache" />
-    <Content Include="package.json" />
-    <Content Include="typings\globals\async\typings.json" />
-    <Content Include="typings\globals\gm\typings.json" />
-    <Content Include="typings\globals\node\typings.json" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="index.js" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsTools.targets" />
 </Project>
