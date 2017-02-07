@@ -36,6 +36,11 @@
       "Type": "String",
       "Default": "Users"
     },
+    "RoundsTableName": {
+      "Description": "The name of  table in Dynamodb which is rounds table.",
+      "Type": "String",
+      "Default": "Rounds"
+    },
     "TicketsTableName": {
       "Description": "The name of  table in Dynamodb which is Tickets table.",
       "Type": "String",
@@ -639,7 +644,7 @@
             }
           },
           {
-            "PolicyName": "GetShopfromTable",
+            "PolicyName": "GetRoundfromTable",
             "PolicyDocument": {
               "Version": "2012-10-17",
               "Statement": [
@@ -665,7 +670,7 @@
                           ":",
                           "table/",
                           {
-                            "Ref": "ShopTableName"
+                            "Ref": "RoundsTableName"
                           }
                         ]
                       ]
@@ -1176,6 +1181,35 @@
           "id": "746e5893-3c86-40e8-92c8-95eebc2778be"
         }
       }
+    },
+    "Rounds": {
+      "Type": "AWS::DynamoDB::Table",
+      "Properties": {
+        "TableName": {
+          "Ref": "RoundsTableName"
+        },
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "id",
+            "AttributeType": "S"
+          }
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "id",
+            "KeyType": "HASH"
+          }
+        ],
+        "ProvisionedThroughput": {
+          "ReadCapacityUnits": "1",
+          "WriteCapacityUnits": "1"
+        }
+      },
+      "Metadata": {
+        "AWS::CloudFormation::Designer": {
+          "id": "5ccb6aa2-f8c4-400a-b743-ec089b6e4a5f"
+        }
+      }
     }
   },
   "Metadata": {
@@ -1290,7 +1324,7 @@
         },
         "position": {
           "x": -80,
-          "y": 590
+          "y": 560
         },
         "z": 1,
         "embeds": []
@@ -1301,8 +1335,8 @@
           "height": 60
         },
         "position": {
-          "x": -70,
-          "y": -30
+          "x": -80,
+          "y": 10
         },
         "z": 1,
         "embeds": []
@@ -1376,7 +1410,7 @@
           "height": 60
         },
         "position": {
-          "x": -70,
+          "x": -80,
           "y": 210
         },
         "z": 1,
@@ -1388,8 +1422,8 @@
           "height": 60
         },
         "position": {
-          "x": -70,
-          "y": 90
+          "x": -80,
+          "y": 120
         },
         "z": 1,
         "embeds": []
@@ -1401,7 +1435,7 @@
         },
         "position": {
           "x": -80,
-          "y": 490
+          "y": 460
         },
         "z": 1,
         "embeds": []
@@ -1414,6 +1448,18 @@
         "position": {
           "x": -80,
           "y": 340
+        },
+        "z": 1,
+        "embeds": []
+      },
+      "5ccb6aa2-f8c4-400a-b743-ec089b6e4a5f": {
+        "size": {
+          "width": 60,
+          "height": 60
+        },
+        "position": {
+          "x": -180,
+          "y": 210
         },
         "z": 1,
         "embeds": []
