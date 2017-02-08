@@ -5,6 +5,7 @@
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
     <Name>CognitoSynctrigger</Name>
     <RootNamespace>CognitoSynctrigger</RootNamespace>
+    <StartupFile>index.js</StartupFile>
   </PropertyGroup>
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -15,7 +16,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>93a99353-34b5-47fa-87c9-63d274e18909</ProjectGuid>
+    <ProjectGuid>{ec174c52-3cdd-4643-a935-e2f404ae378b}</ProjectGuid>
     <ProjectHome>.</ProjectHome>
     <StartWebBrowser>False</StartWebBrowser>
     <SearchPath>
@@ -33,6 +34,9 @@
   </PropertyGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="index.js" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsTools.targets" />
 </Project>

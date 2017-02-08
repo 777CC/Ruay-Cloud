@@ -2,40 +2,23 @@
 const doc = require('dynamodb-doc');
 const dynamo = new doc.DynamoDB();
 const async = require('async');
-
-
 const userDataKeys = ["tel","gender","firstName", "lastName", "interests","birthday"];
 
-function setValue(dataset,valueName,newValue){
-    if (valueName in dataset) {
-            dataset[valueName].newValue = newValue;
-            dataset[valueName].op = 'replace';
-        }
-}
-
-exports.handler = (event, context, callback) => {
-    const modifiedEvent = event;
+exports.handler = function (event, context, callback) {
     // Check for the event type
     if (event.eventType === 'SyncTrigger') {
         if('updateTime' in event.datasetRecords){
-            if(event.datasetRecords.updateTime.newValue !== event.datasetRecords.updateTime.oldValue){
-                async.parallel([
-                    //get user's rewards from dynamodb
-                    function(cb) {
-                    getUserReward(cb,modifiedEvent);
-                },
-                    //get user's items from dynamodb
-                    function(cb) {
-                    getUserTicket(cb,modifiedEvent);
-                },
-                    //get user's info from dynamodb
-                    function(cb) {
-                    getUserInfo(cb,modifiedEvent);
-                }
-                ], function(err) { //This function gets called after the two tasks have called their "task callbacks"
-                    if (err) return console.log(err);
-                    console.log(JSON.stringify(modifiedEvent));
-                    context.done(null, modifiedEvent);
+			if (event.datasetRecords.updateTime.newValue !== event.datasetRecords.updateTime.oldValue) {
+                async.parallel({
+					info: getUserInfo.bind(null, event),
+					reward: getUserReward.bind(null, event.identityId),
+					ticket: getUserTicket.bind(null, event.identityId)
+				}, function(err, results) { //This function gets called after the two tasks have called their "task callbacks"
+					if (err) return console.log(err);
+					editRecord(event, 'rewards', JSON.stringify(results.reward));
+					editRecord(event, 'tickets', JSON.stringify(results.ticket));
+					console.log(JSON.stringify(event));
+                    context.done(null, event);
                 });
             }
             else{
@@ -44,59 +27,76 @@ exports.handler = (event, context, callback) => {
         }
     }
 };
-
-function addDatatoDataset(dataset,key,data){
-    if (key in dataset.datasetRecords) {
-                                    dataset.datasetRecords[key].newValue = data;
-                                    dataset.datasetRecords[key].op = 'replace';
-                                    }
-                                else {
-                                    dataset.datasetRecords[key] = {
-                                        newValue: data,
-                                        op: 'replace',
-                                    };
-                                }
+function editRecord(dataset, key, data) {
+	if (data) {
+		dataset.datasetRecords[key] = {
+			newValue: data,
+			op: 'replace',
+		};
+	}
 }
-
-function getUserTicket(callback,modifiedEvent){
+function nextDailyRewardTime() {
+	var today = new Date();
+	
+	//if(20 < 21)
+	var tomorrow;
+	if (today.getUTCHours() > 21) {
+		//if(20 < 21){
+		tomorrow = Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate(), 21);
+	}
+	else {
+		tomorrow = Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate(), 21) + 86400000;
+	}
+	return tomorrow;
+}
+function addDataset(userData, datasetRecords) {
+	userDataKeys.forEach(function (item) {
+		if (item in datasetRecords) {
+			if (item === "interests") {
+				var interests = datasetRecords[item].newValue.split('#').filter(function (el) { return el.length !== 0 });
+				userData[item] = dynamo.Set(interests, "S");
+			}
+			else {
+				userData[item] = datasetRecords[item].newValue;
+			}
+		}
+	});
+}
+function getUserTicket(id, callback){
     var ticketParams = {
                         TableName : process.env.TicketsTableName,
                         ProjectionExpression:"createdOn, roundId, reserveNumber, amount, announced",
                         KeyConditionExpression: "ownerId = :ownerId ",
                         ExpressionAttributeValues: {
-                            ":ownerId": modifiedEvent.identityId
+                            ":ownerId": id
                         }
                     };
                     dynamo.query(ticketParams, function(err, data) {
                         if (err) {
                             console.log("Unable to query. Error:", JSON.stringify(err, null, 2));
                         } else {
-                                addDatatoDataset(modifiedEvent,'tickets',JSON.stringify(data.Items));
-                                callback();
+                            callback();
                         }
                     });
 }
-
-function getUserReward(callback,modifiedEvent){
+function getUserReward(id, callback){
     var rewardParams = {
                         TableName : process.env.RewardsTableName,
                         ProjectionExpression:"createdOn, itemId, choice, amount, shippingStatus, emsId",
                         KeyConditionExpression: "ownerId = :ownerId ",
                         ExpressionAttributeValues: {
-                            ":ownerId": modifiedEvent.identityId
+                            ":ownerId": id
                         }
                     };
                     dynamo.query(rewardParams, function(err, data) {
                         if (err) {
                             console.log("Unable to query. Error:", JSON.stringify(err, null, 2));
                         } else {
-                                addDatatoDataset(modifiedEvent,'rewards',JSON.stringify(data.Items));
-                                callback();
+                            callback(null, data.Items);
                         }
                     });
 }
-
-function getUserInfo(callback,modifiedEvent){
+function getUserInfo(modifiedEvent, callback){
         dynamo.getItem(
                     {
                         "TableName": process.env.UsersTableName,
@@ -116,37 +116,6 @@ function getUserInfo(callback,modifiedEvent){
                         }
                     });
 }
-
-function nextDailyRewardTime(){
-    var today = new Date();
- 
-    //if(20 < 21)
-    var tomorrow;
-    if(today.getUTCHours() > 21){
-    //if(20 < 21){
-    	tomorrow = Date.UTC(today.getUTCFullYear(),today.getUTCMonth(),today.getUTCDate(),21);
-    }
-    else{
-    	tomorrow = Date.UTC(today.getUTCFullYear(),today.getUTCMonth(),today.getUTCDate(),21) + 86400000;
-    }
-    return tomorrow;
-}
-
-function addDataset(userData,datasetRecords){
-    userDataKeys.forEach(function(item) {
-        if (item in datasetRecords) {
-            if(item === "interests")
-            {
-                var interests = datasetRecords[item].newValue.split('#').filter(function(el) {return el.length !== 0});
-                userData[item] = dynamo.Set(interests, "S");
-            }
-            else{
-                userData[item] = datasetRecords[item].newValue;
-            }
-        }
-    });
-}
-
 function addUser(callback,modifiedEvent){
     //"ticket": dynamo.Set(["fdsafdsafdsa","fdsafdasfdasf"], "S")
     //error!! stringset cannot be empty "ticket": dynamo.Set([], "S")
@@ -175,7 +144,6 @@ function addUser(callback,modifiedEvent){
                             callback();
                     });
 }
-
 function updateUserInfo(callback,oldData,modifiedEvent){
     var userParams = {
         TableName:process.env.UsersTableName,
@@ -184,13 +152,12 @@ function updateUserInfo(callback,oldData,modifiedEvent){
     if ("satang" in modifiedEvent.datasetRecords) {
         if(modifiedEvent.datasetRecords.satang !== null && oldData.satang !== null)
         {
-            console.log("UpdateItem succeeded:", JSON.stringify(oldData));
             modifiedEvent.datasetRecords.satang.newValue = oldData.Item.satang;
             modifiedEvent.datasetRecords.satang.op = 'replace';
         }
     }
     else{
-            addDatatoDataset(modifiedEvent,"satang",oldData.Item.satang);
+            editRecord(modifiedEvent,"satang",oldData.Item.satang);
         }
     
     

@@ -553,6 +553,19 @@
             "Ref": "CodeManualResize"
           }
         },
+        "Environment": {
+          "Variables": {
+            "TicketsTableName": {
+              "Ref": "TicketsTableName"
+            },
+            "RoundsTableName": {
+              "Ref": "RoundsTableName"
+            },
+            "UsersTableName": {
+              "Ref": "UsersTableName"
+            }
+          }
+        },
         "Description": "generic hanlder",
         "Handler": "index.handler",
         "MemorySize": 128,
@@ -1190,13 +1203,13 @@
         },
         "AttributeDefinitions": [
           {
-            "AttributeName": "id",
+            "AttributeName": "ownerId",
             "AttributeType": "S"
           }
         ],
         "KeySchema": [
           {
-            "AttributeName": "id",
+            "AttributeName": "ownerId",
             "KeyType": "HASH"
           }
         ],

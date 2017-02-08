@@ -2,55 +2,77 @@
 const async = require("async");
 const doc = require('dynamodb-doc');
 const dynamo = new doc.DynamoDB();
+//{
+//	"roundId" : "",
+//	"choice" : "",
+//	"amount" : "",
+//}
 exports.handler = function (event, context, callback){
-	var user;
-	console.log("Start");
-	//async.parallel([
- //                   //get user's info from dynamodb
-	//		function (cb) {
-	//		getUserInfo(cb, context, user);
-	//	},
-	//	function (cb) {
-	//		cb();
-	//	}
-	//	], function (err) { //This function gets called after the two tasks have called their "task callbacks"
-	//		if (err) return console.log(err);
-	//		context.done(null, JSON.stringify(user));
-	//});
-
-	async.parallel([function (callback) {
-			getUserInfo(callback, context, user);
-		}, function (callback) {
-			console.log("B");
-			callback();
-		}], function done(err, results) {
+	async.parallel({
+		info: getUserInfo.bind(null, context.identity.cognitoIdentityId),
+		round: getUserInfo.bind(null, event.roundId),
+		tickets: getTicket.bind(null, context.identity.cognitoIdentityId, event.roundId),
+		}, function done(err, results) {
 		if (err) {
 			console.log(err);
 		}
-		context.done(null, "done");
+		callback(null, JSON.stringify(results.info));
 	});
 };
-
-function getUserInfo(callback, context, user) {
+function getUserInfo(id, callback) {
 	dynamo.getItem(
 		{
 			"TableName": process.env.UsersTableName,
-			"Key": { "id" : context.identity.accountId }
+			"Key": { "id" :  id}
 		}
                     , function (err, data) {
 			if (err) {
-				console.log(JSON.stringify(err));
 				callback("Error : " + JSON.stringify(err));
 			}
 			else if (Object.keys(data).length === 0) {
-				console.log(JSON.stringify(err));
 				callback("Error : no user info");
 			}
 			else {
-				user = data;
-				//callback();
 				console.log(JSON.stringify(data));
-				callback("Error : no user info");
+				callback(null,data);
 			}
 		});
+}
+function getRound(roundId, callback) {
+	dynamo.getItem(
+		{
+			"TableName": process.env.RoundsTableName,
+			"Key": { "id" : roundId }
+		}
+        , function (err, data) {
+			if (err) {
+				callback("Error : " + JSON.stringify(err));
+			}
+			else {
+				console.log(JSON.stringify(data));
+				callback(null, data);
+			}
+		});
+}
+function getTicket(userId, roundId, callback) {
+	dynamo.getItem(
+		{
+			"TableName": process.env.TicketsTableName,
+			"Key": {
+				"ownerId" : userId,
+				"roundId" : roundId,
+			}
+		}
+        , function (err, data) {
+			if (err) {
+				callback("Error : " + JSON.stringify(err));
+			}
+			else {
+				console.log(JSON.stringify(data));
+				callback(null, data);
+			}
+		});
+}
+function addTicket(user, round, callback) {
+
 }
