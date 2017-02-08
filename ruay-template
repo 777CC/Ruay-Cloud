@@ -1203,13 +1203,13 @@
         },
         "AttributeDefinitions": [
           {
-            "AttributeName": "ownerId",
+            "AttributeName": "id",
             "AttributeType": "S"
           }
         ],
         "KeySchema": [
           {
-            "AttributeName": "ownerId",
+            "AttributeName": "id",
             "KeyType": "HASH"
           }
         ],

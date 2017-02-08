@@ -16,6 +16,7 @@ exports.handler = function (event, context, callback){
 		if (err) {
 			console.log(err);
 		}
+
 		callback(null, JSON.stringify(results.info));
 	});
 };
