@@ -7,6 +7,8 @@ Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "BuyTicket", "BuyTicket\BuyT
 EndProject
 Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "CognitoSynctrigger", "CognitoSynctrigger\CognitoSynctrigger.njsproj", "{EC174C52-3CDD-4643-A935-E2F404AE378B}"
 EndProject
+Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "BuyReward", "BuyReward\BuyReward.njsproj", "{976E5618-D89E-4AD0-9DBE-51A3A1595D33}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{EC174C52-3CDD-4643-A935-E2F404AE378B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EC174C52-3CDD-4643-A935-E2F404AE378B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EC174C52-3CDD-4643-A935-E2F404AE378B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{976E5618-D89E-4AD0-9DBE-51A3A1595D33}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{976E5618-D89E-4AD0-9DBE-51A3A1595D33}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{976E5618-D89E-4AD0-9DBE-51A3A1595D33}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{976E5618-D89E-4AD0-9DBE-51A3A1595D33}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

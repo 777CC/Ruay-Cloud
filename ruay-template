@@ -22,9 +22,19 @@
       "Default": "ManualResize.zip"
     },
     "CodeSync": {
-      "Description": "key GetData function .zip file.",
+      "Description": "CognitoSynctrigger Lambda .zip file.",
       "Type": "String",
       "Default": "Sync.zip"
+    },
+    "CodeBuyTicket": {
+      "Description": "BuyTicket Lambda .zip file.",
+      "Type": "String",
+      "Default": "BuyTicket.zip"
+    },
+    "CodeBuyReward": {
+      "Description": "BuyReward Lambda .zip file.",
+      "Type": "String",
+      "Default": "BuyReward.zip"
     },
     "ConfigTableName": {
       "Description": "The name of  table in Dynamodb which is config table.",
@@ -550,7 +560,7 @@
             "Ref": "CodeS3Bucket"
           },
           "S3Key": {
-            "Ref": "CodeManualResize"
+            "Ref": "CodeBuyTicket"
           }
         },
         "Environment": {
@@ -702,7 +712,8 @@
                   "Effect": "Allow",
                   "Action": [
                     "dynamodb:GetItem",
-                    "dynamodb:PutItem"
+                    "dynamodb:PutItem",
+                    "dynamodb:Query"
                   ],
                   "Resource": [
                     {
@@ -1223,6 +1234,205 @@
           "id": "5ccb6aa2-f8c4-400a-b743-ec089b6e4a5f"
         }
       }
+    },
+    "BuyReward": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "FunctionName": "BuyReward",
+        "Code": {
+          "S3Bucket": {
+            "Ref": "CodeS3Bucket"
+          },
+          "S3Key": {
+            "Ref": "CodeBuyReward"
+          }
+        },
+        "Environment": {
+          "Variables": {
+            "RewardsTableName": {
+              "Ref": "RewardsTableName"
+            },
+            "ItemsTableName": {
+              "Ref": "ItemsTableName"
+            },
+            "UsersTableName": {
+              "Ref": "UsersTableName"
+            }
+          }
+        },
+        "Description": "generic hanlder",
+        "Handler": "index.handler",
+        "MemorySize": 128,
+        "Role": {
+          "Fn::GetAtt": [
+            "BuyRewardRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs4.3",
+        "Timeout": 30
+      },
+      "Metadata": {
+        "AWS::CloudFormation::Designer": {
+          "id": "bf8a264d-c685-4a87-8379-186a5f8ddf87"
+        }
+      }
+    },
+    "BuyRewardRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        },
+        "Path": "/",
+        "Policies": [
+          {
+            "PolicyName": "logs",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:*"
+                  ],
+                  "Resource": "arn:aws:logs:*:*:*"
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "GetUserfromTable",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "dynamodb:GetItem",
+                    "dynamodb:UpdateItem"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Join": [
+                        "",
+                        [
+                          "arn:aws:dynamodb",
+                          ":",
+                          {
+                            "Ref": "AWS::Region"
+                          },
+                          ":",
+                          {
+                            "Ref": "AWS::AccountId"
+                          },
+                          ":",
+                          "table/",
+                          {
+                            "Ref": "UsersTableName"
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "GetItemfromTable",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "dynamodb:GetItem"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Join": [
+                        "",
+                        [
+                          "arn:aws:dynamodb",
+                          ":",
+                          {
+                            "Ref": "AWS::Region"
+                          },
+                          ":",
+                          {
+                            "Ref": "AWS::AccountId"
+                          },
+                          ":",
+                          "table/",
+                          {
+                            "Ref": "ItemsTableName"
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "GetRewardfromTable",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "dynamodb:GetItem",
+                    "dynamodb:PutItem",
+                    "dynamodb:Query"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Join": [
+                        "",
+                        [
+                          "arn:aws:dynamodb",
+                          ":",
+                          {
+                            "Ref": "AWS::Region"
+                          },
+                          ":",
+                          {
+                            "Ref": "AWS::AccountId"
+                          },
+                          ":",
+                          "table/",
+                          {
+                            "Ref": "RewardsTableName"
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "Metadata": {
+        "AWS::CloudFormation::Designer": {
+          "id": "9c49dd65-a34d-48ec-95a4-e0d31c798132"
+        }
+      }
     }
   },
   "Metadata": {
@@ -1476,6 +1686,38 @@
         },
         "z": 1,
         "embeds": []
+      },
+      "bf8a264d-c685-4a87-8379-186a5f8ddf87": {
+        "size": {
+          "width": 60,
+          "height": 60
+        },
+        "position": {
+          "x": 190,
+          "y": 590
+        },
+        "z": 1,
+        "embeds": [],
+        "isrelatedto": [
+          "ca1f96a9-87e2-4547-8db6-9a2a91f82276",
+          "698c3a41-29be-46e4-831f-1be5b855a623",
+          "9c49dd65-a34d-48ec-95a4-e0d31c798132"
+        ]
+      },
+      "9c49dd65-a34d-48ec-95a4-e0d31c798132": {
+        "size": {
+          "width": 60,
+          "height": 60
+        },
+        "position": {
+          "x": 70,
+          "y": 590
+        },
+        "z": 1,
+        "embeds": [],
+        "isrelatedto": [
+          "e2f3dd43-b448-4673-8d3d-53466960f182"
+        ]
       }
     }
   }

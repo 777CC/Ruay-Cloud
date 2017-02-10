@@ -3,17 +3,17 @@ const async = require("async");
 const doc = require('dynamodb-doc');
 const dynamo = new doc.DynamoDB();
 //{
-//	"roundId" : "",
-//	"reserveNumber" : "",
+//	"itemId" : "",
+//	"option" : "",
 //	"amount" : "",
 //}
-exports.handler = function (event, context, callback){
+exports.handler = function (event, context, callback) {
 	if (event.amount >= 1) {
 		var userId = context.identity.cognitoIdentityId;
 		async.parallel({
 			info: getData.bind(null, process.env.UsersTableName, "id", userId),
-			round: getData.bind(null, process.env.RoundsTableName, "id", event.roundId),
-			tickets: getTickets.bind(null, userId, event.roundId)
+			item: getData.bind(null, process.env.ItemsTableName, "id", event.itemId),
+			rewards: getRewards.bind(null, userId, event.itemId)
 		}, function done(err, results) {
 			if (err) {
 				console.error(err);
@@ -21,18 +21,18 @@ exports.handler = function (event, context, callback){
 			}
 			else {
 				var sumAmount = 0;
-				results.tickets.Items.forEach(function (item) {
-					sumAmount += item.amount;
+				results.rewards.Items.forEach(function (reward) {
+					sumAmount += reward.amount;
 				});
-				var payValue = results.round.Item.price * event.amount;
+				var payValue = results.item.Item.price * event.amount;
 				if (results.info.satang < payValue) {
 					callback("Not enough satang.");
 				}
-				else if (sumAmount + event.amount > results.round.Item.limit) {
-					callback("Over ticket's limit.");
+				else if (sumAmount + event.amount > results.item.Item.limit) {
+					callback("Over reward's limit.");
 				}
 				else {
-					buyTicket(userId, payValue, event.roundId, event.reserveNumber, event.amount, callback);
+					buyReward(userId, payValue, event.itemId, event.option, event.amount, callback);
 				}
 			}
 		});
@@ -55,36 +55,35 @@ function getData(tableName, keyName, id, callback) {
 		}
 	});
 }
-function getTickets(userId,roundId, callback) {
+function getRewards(userId, itemId, callback) {
 	var params = {
-		TableName : process.env.TicketsTableName,
-		ProjectionExpression: "createdOn, roundId, reserveNumber, amount, announced",
+		TableName : process.env.RewardsTableName,
+		ProjectionExpression: "createdOn, itemId, option, amount, shippingStatus, emsId",
 		KeyConditionExpression: "ownerId = :ownerId",
-		FilterExpression: "roundId = :roundId",
+		FilterExpression: "itemId = :itemId",
 		ExpressionAttributeValues: {
 			":ownerId": userId,
-			":roundId": roundId
+			":itemId": itemId
 		}
 	};
 	dynamo.query(params, function (err, data) {
 		if (err) {
-			callback("Error getTickets : " + JSON.stringify(err, null, 2));
+			callback("Error getRewards : " + JSON.stringify(err, null, 2));
 		} else {
 			callback(null, data);
 		}
 	});
 }
-function buyTicket(userId, payValue, roundId, reserveNumber, amount, callback) {
+function buyReward(userId, payValue, itemId, option, amount, callback) {
 	async.parallel({
 		info: updateInfo.bind(null, userId, payValue),
-		ticket: addTicket.bind(null, userId, roundId, reserveNumber, amount)
+		reward: addReward.bind(null, userId, itemId, option, amount)
 	}, function done(err, results) {
 		if (err) {
-			callback("Error buy ticket : " + JSON.stringify(err, null, 2));
+			callback("Error buyReward : " + JSON.stringify(err, null, 2));
 		}
 		else {
-			console.log(JSON.stringify(results.ticket));
-			callback(null, JSON.stringify(results.ticket));
+			callback(null, JSON.stringify(results.reward));
 		}
 	});
 }
@@ -99,30 +98,30 @@ function updateInfo(userId, payValue, callback) {
 	}
 	dynamo.updateItem(params, function (err, data) {
 		if (err) {
-			callback("Error buy ticket : " + JSON.stringify(err, null, 2));
+			callback("Error updateInfo : " + JSON.stringify(err, null, 2));
 		} else {
 			callback(null, data);
 		}
 	});
 }
-function addTicket(userId, roundId, reserveNumber, amount, callback) {
-	var ticket = {
+function addReward(userId, itemId, option, amount, callback) {
+	var reward = {
 		"ownerId": userId,
 		"createdOn": Date.now(),
-		"roundId": roundId,
-		"reserveNumber": reserveNumber,
+		"itemId": itemId,
+		"option": option,
 		"amount": amount,
-		"announced": false
+		"shippingStatus": 1
 	};
 	dynamo.putItem({
 		TableName: process.env.TicketsTableName,
-		Item: ticket
+		Item: reward
 	}, function (err, data) {
 		if (err) {
-			callback("Can not add ticket. : " + JSON.stringify(err, null, 2));
+			callback("Error addReward : " + JSON.stringify(err, null, 2));
 		}
 		else {
-			callback(null, ticket);
+			callback(null, reward);
 		}
 	});
 }
