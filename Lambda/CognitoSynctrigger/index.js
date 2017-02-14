@@ -3,7 +3,7 @@ const doc = require('dynamodb-doc');
 const dynamo = new doc.DynamoDB();
 const async = require('async');
 const userDataKeys = ["tel","gender","firstName", "lastName", "interests","birthday"];
-
+const nextDailyRewardValue = 1000;
 exports.handler = function (event, context, callback) {
     // Check for the event type
     if (event.eventType === 'SyncTrigger') {
@@ -36,8 +36,8 @@ function editRecord(dataset, key, data) {
 	}
 }
 function nextDailyRewardTime() {
+	//next day is after 4 o'clock in the morning.
 	var today = new Date();
-	
 	//if(20 < 21)
 	var tomorrow;
 	if (today.getUTCHours() > 21) {
@@ -125,7 +125,8 @@ function addUser(callback,modifiedEvent){
     var user = {
         "id": modifiedEvent.identityId,
         "createdOn":Date.now(),
-        "updateTime":Date.now(),
+		"updateTime": Date.now(),
+		"nextDailyRewardTime": nextDailyRewardTime(),
         "satang": 0
     };
     
@@ -181,7 +182,12 @@ function updateUserInfo(callback,oldData,modifiedEvent){
             }
         }
     });
-    
+	if (Date.now() > nextDailyRewardTime()) {
+		var isUpdate = true;
+		UpdateExpression += "satang = satang + :v, ";
+		userParams.ExpressionAttributeValues[":v"] = nextDailyRewardValue;
+	}
+
     if(isUpdate){
         userParams.UpdateExpression = UpdateExpression.substring(0, UpdateExpression.length - 2);
         console.log( JSON.stringify(userParams));

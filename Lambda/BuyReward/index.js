@@ -4,7 +4,7 @@ const doc = require('dynamodb-doc');
 const dynamo = new doc.DynamoDB();
 //{
 //	"itemId" : "",
-//	"option" : "",
+//	"choice" : "",
 //	"amount" : "",
 //}
 exports.handler = function (event, context, callback) {
@@ -32,7 +32,7 @@ exports.handler = function (event, context, callback) {
 					callback("Over reward's limit.");
 				}
 				else {
-					buyReward(userId, payValue, event.itemId, event.option, event.amount, callback);
+					buyReward(userId, payValue, event.itemId, event.choice, event.amount, callback);
 				}
 			}
 		});
@@ -58,7 +58,7 @@ function getData(tableName, keyName, id, callback) {
 function getRewards(userId, itemId, callback) {
 	var params = {
 		TableName : process.env.RewardsTableName,
-		ProjectionExpression: "createdOn, itemId, option, amount, shippingStatus, emsId",
+		ProjectionExpression: "createdOn, itemId, choice, amount, shippingStatus, emsId",
 		KeyConditionExpression: "ownerId = :ownerId",
 		FilterExpression: "itemId = :itemId",
 		ExpressionAttributeValues: {
@@ -74,16 +74,16 @@ function getRewards(userId, itemId, callback) {
 		}
 	});
 }
-function buyReward(userId, payValue, itemId, option, amount, callback) {
+function buyReward(userId, payValue, itemId, choice, amount, callback) {
 	async.parallel({
 		info: updateInfo.bind(null, userId, payValue),
-		reward: addReward.bind(null, userId, itemId, option, amount)
+		reward: addReward.bind(null, userId, itemId, choice, amount)
 	}, function done(err, results) {
 		if (err) {
 			callback("Error buyReward : " + JSON.stringify(err, null, 2));
 		}
 		else {
-			callback(null, JSON.stringify(results.reward));
+			callback(null, results.reward);
 		}
 	});
 }
@@ -104,23 +104,24 @@ function updateInfo(userId, payValue, callback) {
 		}
 	});
 }
-function addReward(userId, itemId, option, amount, callback) {
+function addReward(userId, itemId, choice, amount, callback) {
 	var reward = {
 		"ownerId": userId,
 		"createdOn": Date.now(),
 		"itemId": itemId,
-		"option": option,
+		"choice": choice,
 		"amount": amount,
 		"shippingStatus": 1
 	};
 	dynamo.putItem({
-		TableName: process.env.TicketsTableName,
+		TableName: process.env.RewardsTableName,
 		Item: reward
 	}, function (err, data) {
 		if (err) {
 			callback("Error addReward : " + JSON.stringify(err, null, 2));
 		}
 		else {
+			delete reward.ownerId;
 			callback(null, reward);
 		}
 	});

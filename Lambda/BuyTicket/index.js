@@ -84,7 +84,7 @@ function buyTicket(userId, payValue, roundId, reserveNumber, amount, callback) {
 		}
 		else {
 			console.log(JSON.stringify(results.ticket));
-			callback(null, JSON.stringify(results.ticket));
+			callback(null, results.ticket);
 		}
 	});
 }
@@ -122,6 +122,7 @@ function addTicket(userId, roundId, reserveNumber, amount, callback) {
 			callback("Can not add ticket. : " + JSON.stringify(err, null, 2));
 		}
 		else {
+			delete ticket.ownerId;
 			callback(null, ticket);
 		}
 	});
