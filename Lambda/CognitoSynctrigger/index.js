@@ -2,7 +2,7 @@
 const doc = require('dynamodb-doc');
 const dynamo = new doc.DynamoDB();
 const async = require('async');
-const userDataKeys = ["tel","gender","firstName", "lastName", "interests","birthday"];
+const userDataKeys = ['firstName', 'lastName', 'phoneNumber', 'birthday', 'gender', 'zodiac', 'interests' ];
 const nextDailyRewardValue = 1000;
 exports.handler = function (event, context, callback) {
     // Check for the event type
@@ -22,7 +22,7 @@ exports.handler = function (event, context, callback) {
                 });
             }
             else{
-                context.done(null, modifiedEvent);
+                context.done(null, event);
             }
         }
     }
@@ -169,12 +169,15 @@ function updateUserInfo(callback,oldData,modifiedEvent){
         if (key in modifiedEvent.datasetRecords) {
             if(modifiedEvent.datasetRecords[key].op === 'replace'){
                 isUpdate = true;
-                
                 if(key === 'interests'){
                     UpdateExpression += "interests = :interests, ";
                     var interests = modifiedEvent.datasetRecords[key].newValue.split('#').filter(function(el) {return el.length !== 0});
                     userParams.ExpressionAttributeValues[":interests"] = dynamo.Set(interests, "S");
-                }
+				}
+				else if(key === 'zodiac') {
+					UpdateExpression += key + " = :" + key + ", ";
+					userParams.ExpressionAttributeValues[":" + key] = parseInt(modifiedEvent.datasetRecords[key].newValue);
+				}
                 else{
                     UpdateExpression += key + " = :" + key + ", ";
                     userParams.ExpressionAttributeValues[":" +key] = modifiedEvent.datasetRecords[key].newValue;
