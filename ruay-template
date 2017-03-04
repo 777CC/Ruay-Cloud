@@ -37,37 +37,42 @@
       "Default": "BuyReward.zip"
     },
     "ConfigTableName": {
-      "Description": "The name of  table in Dynamodb which is config table.",
+      "Description": "The name of  table in Dynamodb which is config.",
       "Type": "String",
       "Default": "Config"
     },
     "UsersTableName": {
-      "Description": "The name of  table in Dynamodb which is Users table.",
+      "Description": "The name of  table in Dynamodb which is Users.",
       "Type": "String",
       "Default": "Users"
     },
+    "InviteNameTableName": {
+      "Description": "The name of table in Dynamodb which is inviteName.",
+      "Type": "String",
+      "Default": "InviteName"
+    },
     "RoundsTableName": {
-      "Description": "The name of  table in Dynamodb which is rounds table.",
+      "Description": "The name of  table in Dynamodb which is rounds.",
       "Type": "String",
       "Default": "Rounds"
     },
     "TicketsTableName": {
-      "Description": "The name of  table in Dynamodb which is Tickets table.",
+      "Description": "The name of  table in Dynamodb which is Tickets.",
       "Type": "String",
       "Default": "Tickets"
     },
     "ShopTableName": {
-      "Description": "The name of  table in Dynamodb which is Shop table.",
+      "Description": "The name of  table in Dynamodb which is Shop.",
       "Type": "String",
       "Default": "Shop"
     },
     "ItemsTableName": {
-      "Description": "The name of  table in Dynamodb which is Items table.",
+      "Description": "The name of  table in Dynamodb which is Items.",
       "Type": "String",
       "Default": "Items"
     },
     "RewardsTableName": {
-      "Description": "The name of  table in Dynamodb which is Items table.",
+      "Description": "The name of  table in Dynamodb which is rewards.",
       "Type": "String",
       "Default": "Rewards"
     }
@@ -801,6 +806,9 @@
             },
             "UsersTableName": {
               "Ref": "UsersTableName"
+            },
+            "InviteNameTableName": {
+              "Ref": "InviteNameTableName"
             }
           }
         },
@@ -896,7 +904,7 @@
             }
           },
           {
-            "PolicyName": "GetShopfromTable",
+            "PolicyName": "GetInviteNamefromTable",
             "PolicyDocument": {
               "Version": "2012-10-17",
               "Statement": [
@@ -922,7 +930,7 @@
                           ":",
                           "table/",
                           {
-                            "Ref": "ShopTableName"
+                            "Ref": "InviteNameTableName"
                           }
                         ]
                       ]
@@ -1433,6 +1441,35 @@
           "id": "9c49dd65-a34d-48ec-95a4-e0d31c798132"
         }
       }
+    },
+    "InviteName": {
+      "Type": "AWS::DynamoDB::Table",
+      "Properties": {
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "inviteName",
+            "AttributeType": "S"
+          }
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "inviteName",
+            "KeyType": "HASH"
+          }
+        ],
+        "TableName": {
+          "Ref": "InviteNameTableName"
+        },
+        "ProvisionedThroughput": {
+          "ReadCapacityUnits": "1",
+          "WriteCapacityUnits": "1"
+        }
+      },
+      "Metadata": {
+        "AWS::CloudFormation::Designer": {
+          "id": "c0737172-2fbe-4e9c-856d-ed91899287e1"
+        }
+      }
     }
   },
   "Metadata": {
@@ -1718,6 +1755,18 @@
         "isrelatedto": [
           "e2f3dd43-b448-4673-8d3d-53466960f182"
         ]
+      },
+      "c0737172-2fbe-4e9c-856d-ed91899287e1": {
+        "size": {
+          "width": 60,
+          "height": 60
+        },
+        "position": {
+          "x": -80,
+          "y": 660
+        },
+        "z": 1,
+        "embeds": []
       }
     }
   }
