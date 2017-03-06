@@ -36,6 +36,11 @@
       "Type": "String",
       "Default": "BuyReward.zip"
     },
+    "CodeSetInviteName": {
+      "Description": "SetInviteName Lambda .zip file.",
+      "Type": "String",
+      "Default": "SetInviteName.zip"
+    },
     "ConfigTableName": {
       "Description": "The name of  table in Dynamodb which is config.",
       "Type": "String",
@@ -46,10 +51,10 @@
       "Type": "String",
       "Default": "Users"
     },
-    "InviteNameTableName": {
+    "InviteNamesTableName": {
       "Description": "The name of table in Dynamodb which is inviteName.",
       "Type": "String",
-      "Default": "InviteName"
+      "Default": "InviteNames"
     },
     "RoundsTableName": {
       "Description": "The name of  table in Dynamodb which is rounds.",
@@ -755,35 +760,6 @@
         }
       }
     },
-    "Shop": {
-      "Type": "AWS::DynamoDB::Table",
-      "Properties": {
-        "TableName": {
-          "Ref": "ShopTableName"
-        },
-        "AttributeDefinitions": [
-          {
-            "AttributeName": "date",
-            "AttributeType": "S"
-          }
-        ],
-        "KeySchema": [
-          {
-            "AttributeName": "date",
-            "KeyType": "HASH"
-          }
-        ],
-        "ProvisionedThroughput": {
-          "ReadCapacityUnits": "1",
-          "WriteCapacityUnits": "1"
-        }
-      },
-      "Metadata": {
-        "AWS::CloudFormation::Designer": {
-          "id": "46ae299a-5895-4011-a466-e5bfca64896d"
-        }
-      }
-    },
     "CognitoSynctrigger": {
       "Type": "AWS::Lambda::Function",
       "Properties": {
@@ -807,8 +783,8 @@
             "UsersTableName": {
               "Ref": "UsersTableName"
             },
-            "InviteNameTableName": {
-              "Ref": "InviteNameTableName"
+            "InviteNamesTableName": {
+              "Ref": "InviteNamesTableName"
             }
           }
         },
@@ -930,7 +906,7 @@
                           ":",
                           "table/",
                           {
-                            "Ref": "InviteNameTableName"
+                            "Ref": "InviteNamesTableName"
                           }
                         ]
                       ]
@@ -1442,7 +1418,7 @@
         }
       }
     },
-    "InviteName": {
+    "InviteNames": {
       "Type": "AWS::DynamoDB::Table",
       "Properties": {
         "AttributeDefinitions": [
@@ -1458,7 +1434,7 @@
           }
         ],
         "TableName": {
-          "Ref": "InviteNameTableName"
+          "Ref": "InviteNamesTableName"
         },
         "ProvisionedThroughput": {
           "ReadCapacityUnits": "1",
@@ -1468,6 +1444,125 @@
       "Metadata": {
         "AWS::CloudFormation::Designer": {
           "id": "c0737172-2fbe-4e9c-856d-ed91899287e1"
+        }
+      }
+    },
+    "SetInviteName": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "FunctionName": "SetInviteName",
+        "Code": {
+          "S3Bucket": {
+            "Ref": "CodeS3Bucket"
+          },
+          "S3Key": {
+            "Ref": "CodeSetInviteName"
+          }
+        },
+        "Environment": {
+          "Variables": {
+            "InviteNamesTableName": {
+              "Ref": "InviteNamesTableName"
+            }
+          }
+        },
+        "Description": "generic hanlder",
+        "Handler": "index.handler",
+        "MemorySize": 128,
+        "Role": {
+          "Fn::GetAtt": [
+            "SetInviteNameRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs4.3",
+        "Timeout": 30
+      },
+      "Metadata": {
+        "AWS::CloudFormation::Designer": {
+          "id": "c43c6002-e7dc-4a55-928f-55b32af06873"
+        }
+      }
+    },
+    "SetInviteNameRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        },
+        "Path": "/",
+        "Policies": [
+          {
+            "PolicyName": "logs",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:*"
+                  ],
+                  "Resource": "arn:aws:logs:*:*:*"
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "GetInviteNamefromTable",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "dynamodb:GetItem",
+                    "dynamodb:PutItem",
+                    "dynamodb:Query",
+                    "dynamodb:DeleteItem"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Join": [
+                        "",
+                        [
+                          "arn:aws:dynamodb",
+                          ":",
+                          {
+                            "Ref": "AWS::Region"
+                          },
+                          ":",
+                          {
+                            "Ref": "AWS::AccountId"
+                          },
+                          ":",
+                          "table/",
+                          {
+                            "Ref": "InviteNamesTableName"
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "Metadata": {
+        "AWS::CloudFormation::Designer": {
+          "id": "b46c37ca-5eee-4085-9b72-c900a7fcfc71"
         }
       }
     }
@@ -1676,18 +1771,6 @@
         "z": 1,
         "embeds": []
       },
-      "46ae299a-5895-4011-a466-e5bfca64896d": {
-        "size": {
-          "width": 60,
-          "height": 60
-        },
-        "position": {
-          "x": -80,
-          "y": 120
-        },
-        "z": 1,
-        "embeds": []
-      },
       "48673dcf-0f04-46d9-96e4-27e04aca73b8": {
         "size": {
           "width": 60,
@@ -1767,6 +1850,39 @@
         },
         "z": 1,
         "embeds": []
+      },
+      "c43c6002-e7dc-4a55-928f-55b32af06873": {
+        "size": {
+          "width": 60,
+          "height": 60
+        },
+        "position": {
+          "x": 180,
+          "y": 270
+        },
+        "z": 1,
+        "embeds": [],
+        "isrelatedto": [
+          "ca1f96a9-87e2-4547-8db6-9a2a91f82276",
+          "87e2afad-1a2e-4dd0-8146-252434ab7202",
+          "b46c37ca-5eee-4085-9b72-c900a7fcfc71"
+        ]
+      },
+      "b46c37ca-5eee-4085-9b72-c900a7fcfc71": {
+        "size": {
+          "width": 60,
+          "height": 60
+        },
+        "position": {
+          "x": 60,
+          "y": 270
+        },
+        "z": 1,
+        "embeds": [],
+        "isrelatedto": [
+          "e2f3dd43-b448-4673-8d3d-53466960f182",
+          "8382f45f-c45b-4b4f-a8e6-c62d06e1a860"
+        ]
       }
     }
   }

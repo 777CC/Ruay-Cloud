@@ -5,7 +5,7 @@ const async = require('async');
 const userDataKeys = ['firstName', 'lastName', 'phoneNumber', 'birthday', 'gender', 'zodiac', 'interests' ];
 const registerReward = 1000;
 const nextDailyRewardValue = 1000;
-const inviteReward = 1000;
+const inviteReward = 7777;
 exports.handler = function (event, context, callback) {
     // Check for the event type
     if (event.eventType === 'SyncTrigger') {
@@ -147,23 +147,23 @@ function updateUserInfo(callback, oldData, modifiedEvent) {
 	};
 
 	var isUpdate = false;
-	var UpdateExpression = "set ";
+	userParams.UpdateExpression = "set ";
 	userParams.ExpressionAttributeValues = {};
 	userDataKeys.forEach(function (key) {
 		if (key in modifiedEvent.datasetRecords) {
 			if (modifiedEvent.datasetRecords[key].op === 'replace') {
 				isUpdate = true;
 				if (key === 'interests') {
-					UpdateExpression += "interests = :interests, ";
+					userParams.UpdateExpression += "interests = :interests, ";
 					var interests = modifiedEvent.datasetRecords[key].newValue.split('#').filter(function (el) { return el.length !== 0 });
 					userParams.ExpressionAttributeValues[":interests"] = dynamo.Set(interests, "S");
 				}
 				else if (key === 'zodiac') {
-					UpdateExpression += key + " = :" + key + ", ";
+					userParams.UpdateExpression += key + " = :" + key + ", ";
 					userParams.ExpressionAttributeValues[":" + key] = parseInt(modifiedEvent.datasetRecords[key].newValue);
 				}
 				else {
-					UpdateExpression += key + " = :" + key + ", ";
+					userParams.UpdateExpression += key + " = :" + key + ", ";
 					userParams.ExpressionAttributeValues[":" + key] = modifiedEvent.datasetRecords[key].newValue;
 				}
 			}
@@ -173,7 +173,7 @@ function updateUserInfo(callback, oldData, modifiedEvent) {
 	//Check and give daily reward, or set satang.
 	if (Date.now() > oldData.nextDailyRewardTime) {
 		isUpdate = true;
-		UpdateExpression += "satang = satang + :reward, nextDailyRewardTime = :nextDailyRewardTime, ";
+		userParams.UpdateExpression += "satang = satang + :reward, nextDailyRewardTime = :nextDailyRewardTime, ";
 		userParams.ExpressionAttributeValues[":reward"] = nextDailyRewardValue;
 		userParams.ExpressionAttributeValues[":nextDailyRewardTime"] = nextDailyRewardTime();
 		editRecord(modifiedEvent, "satang", oldData.satang + nextDailyRewardValue);
@@ -181,10 +181,6 @@ function updateUserInfo(callback, oldData, modifiedEvent) {
 		editRecord(modifiedEvent, "satang", oldData.satang);
 	}
 
-	//delete , from UpdateExpression.
-	userParams.UpdateExpression = UpdateExpression.substring(0, UpdateExpression.length - 2);
-	console.log("userParams : " + isUpdate +JSON.stringify(userParams));
-	
 	//Check and give invite reward.
 	if (!oldData.inviteBy && modifiedEvent.datasetRecords.inviteBy && modifiedEvent.datasetRecords.inviteBy.newValue && modifiedEvent.datasetRecords.inviteBy.newValue.length > 0) {
 		getIdfromInviteName(isUpdate, userParams, modifiedEvent, callback);
@@ -203,7 +199,7 @@ function updateUserInfo(callback, oldData, modifiedEvent) {
 }
 function getIdfromInviteName(isUpdate,params, modifiedEvent, callback) {
 	dynamo.getItem({
-			"TableName": process.env.InviteNameTableName,
+			"TableName": process.env.InviteNamesTableName,
 			"Key": { "inviteName" : modifiedEvent.datasetRecords.inviteBy.newValue }
 		}, function (err, data) {
 		if (err) {
@@ -224,13 +220,13 @@ function getIdfromInviteName(isUpdate,params, modifiedEvent, callback) {
 				Key: {
 					"id" : data.Item.ownerId
 				},
-				UpdateExpression : "set satang = satang + :reward",
+				UpdateExpression : "set satang = satang + :reward, ",
 				ExpressionAttributeValues: {
 					":reward": inviteReward
 				}
 			};
-			params.UpdateExpression += ",inviteBy = :inviteBy";
-			params.ExpressionAttributeValues[":inviteBy"] = inviteName;
+			params.UpdateExpression += "inviteBy = :inviteBy, ";
+			params.ExpressionAttributeValues[":inviteBy"] = modifiedEvent.datasetRecords.inviteBy.newValue;
 			async.parallel({
 				invite: updateUserDB.bind(null, inviteParams),
 				user: updateUserDB.bind(null, params)
@@ -241,6 +237,8 @@ function getIdfromInviteName(isUpdate,params, modifiedEvent, callback) {
 	});
 }
 function updateUserDB(params, callback) {
+	//delete , from UpdateExpression.
+	params.UpdateExpression = params.UpdateExpression.substring(0, params.UpdateExpression.length - 2);
 	dynamo.updateItem(params, function (err, data) {
 		callback(err);
 	});
