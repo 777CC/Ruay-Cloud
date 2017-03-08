@@ -46,6 +46,11 @@
       "Type": "String",
       "Default": "DynamicDynamoDB.zip"
     },
+    "CodeRoundAnnouncement": {
+      "Description": "RoundAnnouncement Lambda .zip file.",
+      "Type": "String",
+      "Default": "RoundAnnouncement.zip"
+    },
     "ConfigTableName": {
       "Description": "The name of  table in Dynamodb which is config.",
       "Type": "String",
@@ -1654,6 +1659,159 @@
           "id": "ab5bc4a6-afc6-495d-be3c-aa429edfc9ee"
         }
       }
+    },
+    "RoundAnnouncement": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "FunctionName": "RoundAnnouncement",
+        "Code": {
+          "S3Bucket": {
+            "Ref": "CodeS3Bucket"
+          },
+          "S3Key": {
+            "Ref": "CodeRoundAnnouncement"
+          }
+        },
+        "Environment": {
+          "Variables": {
+            "TicketsTableName": {
+              "Ref": "TicketsTableName"
+            },
+            "UsersTableName": {
+              "Ref": "UsersTableName"
+            }
+          }
+        },
+        "Description": "generic hanlder",
+        "Handler": "index.handler",
+        "MemorySize": 128,
+        "Role": {
+          "Fn::GetAtt": [
+            "RoundAnnouncementRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs4.3",
+        "Timeout": 30
+      },
+      "Metadata": {
+        "AWS::CloudFormation::Designer": {
+          "id": "99ae20df-52a2-4828-8427-e380c8c2a40d"
+        }
+      }
+    },
+    "RoundAnnouncementRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        },
+        "Path": "/",
+        "Policies": [
+          {
+            "PolicyName": "logs",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Sid": "",
+                  "Action": [
+                    "dynamodb:DescribeTable",
+                    "dynamodb:UpdateTable",
+                    "CloudWatch:getMetricStatistics"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": "*"
+                },
+                {
+                  "Sid": "",
+                  "Resource": "*",
+                  "Action": [
+                    "logs:CreateLogGroup",
+                    "logs:CreateLogStream",
+                    "logs:PutLogEvents"
+                  ],
+                  "Effect": "Allow"
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "dynamodb:UpdateItem"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Join": [
+                        "",
+                        [
+                          "arn:aws:dynamodb",
+                          ":",
+                          {
+                            "Ref": "AWS::Region"
+                          },
+                          ":",
+                          {
+                            "Ref": "AWS::AccountId"
+                          },
+                          ":",
+                          "table/",
+                          {
+                            "Ref": "UsersTableName"
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "dynamodb:Scan"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Join": [
+                        "",
+                        [
+                          "arn:aws:dynamodb",
+                          ":",
+                          {
+                            "Ref": "AWS::Region"
+                          },
+                          ":",
+                          {
+                            "Ref": "AWS::AccountId"
+                          },
+                          ":",
+                          "table/",
+                          {
+                            "Ref": "TicketsTableName"
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "Metadata": {
+        "AWS::CloudFormation::Designer": {
+          "id": "e005886c-9589-44d9-8e96-c5e3a5de7a96"
+        }
+      }
     }
   },
   "Metadata": {
@@ -2000,6 +2158,41 @@
         "position": {
           "x": 70,
           "y": 690
+        },
+        "z": 1,
+        "embeds": [],
+        "isrelatedto": [
+          "e2f3dd43-b448-4673-8d3d-53466960f182"
+        ]
+      },
+      "99ae20df-52a2-4828-8427-e380c8c2a40d": {
+        "size": {
+          "width": 60,
+          "height": 60
+        },
+        "position": {
+          "x": 190,
+          "y": 770
+        },
+        "z": 1,
+        "embeds": [],
+        "isrelatedto": [
+          "ca1f96a9-87e2-4547-8db6-9a2a91f82276",
+          "698c3a41-29be-46e4-831f-1be5b855a623",
+          "9c49dd65-a34d-48ec-95a4-e0d31c798132",
+          "b46c37ca-5eee-4085-9b72-c900a7fcfc71",
+          "ab5bc4a6-afc6-495d-be3c-aa429edfc9ee",
+          "e005886c-9589-44d9-8e96-c5e3a5de7a96"
+        ]
+      },
+      "e005886c-9589-44d9-8e96-c5e3a5de7a96": {
+        "size": {
+          "width": 60,
+          "height": 60
+        },
+        "position": {
+          "x": 70,
+          "y": 770
         },
         "z": 1,
         "embeds": [],
