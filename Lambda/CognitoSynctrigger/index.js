@@ -59,22 +59,22 @@ function addDataset(userData, datasetRecords) {
 		}
 	});
 }
-function getUserTicket(id, callback){
-    var ticketParams = {
-                        TableName : process.env.TicketsTableName,
-                        ProjectionExpression:"createdOn, roundId, reserveNumber, amount, announced",
-                        KeyConditionExpression: "ownerId = :ownerId ",
-                        ExpressionAttributeValues: {
-                            ":ownerId": id
-                        }
-                    };
-                    dynamo.query(ticketParams, function(err, data) {
-                        if (err) {
-                            console.log("Unable to query. Error:", JSON.stringify(err, null, 2));
-                        } else {
-                            callback();
-                        }
-                    });
+function getUserTicket(id, callback) {
+	var ticketParams = {
+		TableName : process.env.TicketsTableName,
+		ProjectionExpression: "createdOn, roundId, reserveNumber, amount, announced",
+		KeyConditionExpression: "ownerId = :ownerId ",
+		ExpressionAttributeValues: {
+			":ownerId": id
+		}
+	};
+	dynamo.query(ticketParams, function (err, data) {
+		if (err) {
+			console.log("Unable to query. Error:", JSON.stringify(err, null, 2));
+		} else {
+			callback(null, data.Items);
+		}
+	});
 }
 function getUserReward(id, callback){
     var rewardParams = {
