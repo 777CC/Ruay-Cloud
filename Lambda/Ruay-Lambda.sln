@@ -11,6 +11,10 @@ Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "BuyReward", "BuyReward\BuyR
 EndProject
 Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "SetInviteName", "SetInviteName\SetInviteName.njsproj", "{E3B28FC3-164C-4CA7-B71C-6B39BF35BF13}"
 EndProject
+Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "DynamicDynamoDB", "DynamicDynamoDB\DynamicDynamoDB.njsproj", "{7BAE3EBE-494D-402B-BF32-F1C15CC7C7B3}"
+EndProject
+Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "RoundAnnouncement", "RoundAnnouncement\RoundAnnouncement.njsproj", "{44A1C988-F6F3-439D-82AF-E39F19F33DC1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +37,14 @@ Global
 		{E3B28FC3-164C-4CA7-B71C-6B39BF35BF13}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E3B28FC3-164C-4CA7-B71C-6B39BF35BF13}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E3B28FC3-164C-4CA7-B71C-6B39BF35BF13}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7BAE3EBE-494D-402B-BF32-F1C15CC7C7B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7BAE3EBE-494D-402B-BF32-F1C15CC7C7B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7BAE3EBE-494D-402B-BF32-F1C15CC7C7B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7BAE3EBE-494D-402B-BF32-F1C15CC7C7B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{44A1C988-F6F3-439D-82AF-E39F19F33DC1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{44A1C988-F6F3-439D-82AF-E39F19F33DC1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{44A1C988-F6F3-439D-82AF-E39F19F33DC1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{44A1C988-F6F3-439D-82AF-E39F19F33DC1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

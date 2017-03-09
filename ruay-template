@@ -1776,7 +1776,8 @@
                 {
                   "Effect": "Allow",
                   "Action": [
-                    "dynamodb:Scan"
+                    "dynamodb:Scan",
+                    "dynamodb:UpdateItem"
                   ],
                   "Resource": [
                     {
