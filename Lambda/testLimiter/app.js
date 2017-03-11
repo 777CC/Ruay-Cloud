@@ -1,8 +1,48 @@
-var RateLimiter = require('limiter').RateLimiter;
+﻿var RateLimiter = require('limiter').RateLimiter;
 var limiter = new RateLimiter(1, 'second', true);  // fire CB immediately
 var async = require("async");
+var config = require('./config.js');
 var i = 10;
-testQueue();
+
+testReward();
+function testReward()
+{
+    //console.log(getReward(999999));
+    //console.log(getReward("978933"));
+    console.log(getReward("987777"));
+    //console.log(getReward(000000));
+}
+function FormatNumberLength(num, length) {
+    var r = "" + num;
+    //console.log("r.length : " + r.length + " length : " + length);
+    if (r.length < length) {
+        while (r.length < length) {
+            r = "0" + r;
+        }
+    } else if (r.length > length) {
+        r = r.substring(r.length - length, r.length);
+    }
+    console.log("r : " + r +" r.length : " + r.length + " length : " + length);
+    return r;
+}
+
+function getReward(reserveNumber) {
+    //console.log(reserveNumber);
+    reward = 0;
+    if (typeof (reserveNumber) != "undefined") {
+        for (var i = 0, len = config.reward.length; i < len; i++) {
+            var number = FormatNumberLength(reserveNumber, config.reward[i].number.length);
+            console.log("reward " + number + " : " + config.reward[i].number);
+            if (number === config.reward[i].number) {
+                reward = config.reward[i].value;
+                //console.log("reward " + number + " : " + config.reward[i].number);
+                break;
+            }
+        }
+    }
+    return reward;
+}
+//testQueue();
 function testQueue() {
     //N = # of simultaneous tasks
     var q = async.queue(function (task, callback) {

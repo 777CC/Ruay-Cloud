@@ -1,6 +1,6 @@
 ﻿module.exports = {
 	roundId:'A20170101',
-	reward: [{ 'number': '999999', 'value': 'รางวัลที่ 1' }, { 'number': '999998', 'value': 'ใกล้เคียงที่ 1' }, { 'number': '777', 'value': 200 }, { 'number': '33', 'value': 7 }],
+	reward: [{ 'number': '999999', 'value': 'รางวัลที่ 1' }, { 'number': '999998', 'value': 'ใกล้เคียงที่ 1' }, { 'number': '999', 'value': '200' }, { 'number': '7', 'value': '7' }],
 	region: 'ap-northeast-1',
 	//ExclusiveStartKey:,//In case of Fail then run this again, Use ExclusiveStartKey from perviously execute.
 	timeframeMin : 5, // evaluation timeframe (minute)
