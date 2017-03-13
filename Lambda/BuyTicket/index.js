@@ -25,13 +25,14 @@ exports.handler = function (event, context, callback){
 					sumAmount += item.amount;
 				});
 				var payValue = results.round.Item.price * event.amount;
-				if (results.info.satang < payValue) {
+				var timeNow = Date.now();
+				if (timeNow < results.round.Item.startTime || timeNow > results.round.Item.endTime) {
+					callback("Invalid date.");
+				} else if (results.info.satang < payValue) {
 					callback("Not enough satang.");
-				}
-				else if (sumAmount + event.amount > results.round.Item.limit) {
+				} else if (sumAmount + event.amount > results.round.Item.limit) {
 					callback("Over ticket's limit.");
-				}
-				else {
+				} else {
 					buyTicket(userId, payValue, event.roundId, event.reserveNumber, event.amount, callback);
 				}
 			}

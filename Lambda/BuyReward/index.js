@@ -25,13 +25,14 @@ exports.handler = function (event, context, callback) {
 					sumAmount += reward.amount;
 				});
 				var payValue = results.item.Item.price * event.amount;
-				if (results.info.satang < payValue) {
+				var timeNow = Date.now();
+				if (timeNow < results.item.Item.startTime || timeNow > results.item.Item.endTime) {
+					callback("Invalid date.");
+				} else if (results.info.satang < payValue) {
 					callback("Not enough satang.");
-				}
-				else if (sumAmount + event.amount > results.item.Item.limit) {
+				} else if (sumAmount + event.amount > results.item.Item.limit) {
 					callback("Over reward's limit.");
-				}
-				else {
+				} else {
 					buyReward(userId, payValue, event.itemId, event.choice, event.amount, callback);
 				}
 			}
