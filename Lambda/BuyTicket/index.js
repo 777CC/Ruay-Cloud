@@ -112,8 +112,8 @@ function addTicket(userId, roundId, reserveNumber, amount, callback) {
 		"createdOn": Date.now(),
 		"roundId": roundId,
 		"reserveNumber": reserveNumber,
-		"amount": amount,
-		"announced": false
+		"amount": amount
+		//"announced": false
 	};
 	dynamo.putItem({
 		TableName: process.env.TicketsTableName,

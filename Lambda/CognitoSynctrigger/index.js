@@ -3,9 +3,9 @@ const doc = require('dynamodb-doc');
 const dynamo = new doc.DynamoDB();
 const async = require('async');
 const userDataKeys = ['firstName', 'lastName', 'phoneNumber', 'birthday', 'gender', 'zodiac', 'interests' ];
-const registerReward = 1000;
-const nextDailyRewardValue = 1000;
-const inviteReward = 7777;
+const registerReward = 99;
+const nextDailyRewardValue = 40;
+const inviteReward = 500;
 exports.handler = function (event, context, callback) {
     // Check for the event type
     if (event.eventType === 'SyncTrigger') {
