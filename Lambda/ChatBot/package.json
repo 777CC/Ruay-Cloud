@@ -1,0 +1,22 @@
+{
+  "name": "chatbot",
+  "version": "0.1.0",
+  "description": "chat bot for facebook messenger",
+  "main": "index.js",
+  "dependencies": {
+    "async": "^2.1.5",
+    "https": "^1.0.0",
+    "request": "^2.81.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "chat",
+    "bot",
+    "facebook"
+  ],
+  "author": "chain choonoi",
+  "license": "ISC"
+}

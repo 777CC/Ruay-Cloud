@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26228.9
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "BuyTicket", "BuyTicket\BuyTicket.njsproj", "{93A99353-34B5-47FA-87C9-63D274E18909}"
 EndProject
@@ -14,6 +14,8 @@ EndProject
 Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "DynamicDynamoDB", "DynamicDynamoDB\DynamicDynamoDB.njsproj", "{7BAE3EBE-494D-402B-BF32-F1C15CC7C7B3}"
 EndProject
 Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "RoundAnnouncement", "RoundAnnouncement\RoundAnnouncement.njsproj", "{44A1C988-F6F3-439D-82AF-E39F19F33DC1}"
+EndProject
+Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "ChatBot", "ChatBot\ChatBot.njsproj", "{71573173-D1D9-4368-B6F8-A77C1A7C5E0F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{44A1C988-F6F3-439D-82AF-E39F19F33DC1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{44A1C988-F6F3-439D-82AF-E39F19F33DC1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{44A1C988-F6F3-439D-82AF-E39F19F33DC1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{71573173-D1D9-4368-B6F8-A77C1A7C5E0F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{71573173-D1D9-4368-B6F8-A77C1A7C5E0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{71573173-D1D9-4368-B6F8-A77C1A7C5E0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{71573173-D1D9-4368-B6F8-A77C1A7C5E0F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
