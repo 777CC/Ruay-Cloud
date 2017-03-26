@@ -51,6 +51,11 @@
       "Type": "String",
       "Default": "RoundAnnouncement.zip"
     },
+    "CodeChatBot": {
+      "Description": "ChatBot Lambda .zip file.",
+      "Type": "String",
+      "Default": "ChatBot.zip"
+    },
     "ConfigTableName": {
       "Description": "The name of  table in Dynamodb which is config.",
       "Type": "String",
@@ -1089,14 +1094,6 @@
           {
             "AttributeName": "createdOn",
             "AttributeType": "N"
-          },
-          {
-            "AttributeName": "roundId",
-            "AttributeType": "S"
-          },
-          {
-            "AttributeName": "reserveNumber",
-            "AttributeType": "N"
           }
         ],
         "KeySchema": [
@@ -1112,29 +1109,7 @@
         "ProvisionedThroughput": {
           "ReadCapacityUnits": "1",
           "WriteCapacityUnits": "1"
-        },
-        "GlobalSecondaryIndexes": [
-          {
-            "IndexName": "roundId-reserveNumber-index",
-            "KeySchema": [
-              {
-                "AttributeName": "roundId",
-                "KeyType": "HASH"
-              },
-              {
-                "AttributeName": "reserveNumber",
-                "KeyType": "RANGE"
-              }
-            ],
-            "Projection": {
-              "ProjectionType": "ALL"
-            },
-            "ProvisionedThroughput": {
-              "ReadCapacityUnits": "1",
-              "WriteCapacityUnits": "1"
-            }
-          }
-        ]
+        }
       },
       "Metadata": {
         "AWS::CloudFormation::Designer": {
@@ -1148,6 +1123,10 @@
         "AttributeDefinitions": [
           {
             "AttributeName": "id",
+            "AttributeType": "S"
+          },
+          {
+            "AttributeName": "fbProfilePicture",
             "AttributeType": "S"
           }
         ],
@@ -1163,7 +1142,25 @@
         "ProvisionedThroughput": {
           "ReadCapacityUnits": "1",
           "WriteCapacityUnits": "1"
-        }
+        },
+        "GlobalSecondaryIndexes": [
+          {
+            "IndexName": "fbProfilePicture-index",
+            "KeySchema": [
+              {
+                "AttributeName": "fbProfilePicture",
+                "KeyType": "HASH"
+              }
+            ],
+            "Projection": {
+              "ProjectionType": "ALL"
+            },
+            "ProvisionedThroughput": {
+              "ReadCapacityUnits": "1",
+              "WriteCapacityUnits": "1"
+            }
+          }
+        ]
       },
       "Metadata": {
         "AWS::CloudFormation::Designer": {
@@ -1813,6 +1810,212 @@
           "id": "e005886c-9589-44d9-8e96-c5e3a5de7a96"
         }
       }
+    },
+    "ChatBotRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        },
+        "Path": "/",
+        "Policies": [
+          {
+            "PolicyName": "logs",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:*"
+                  ],
+                  "Resource": "arn:aws:logs:*:*:*"
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "GetUserfromTable",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "dynamodb:GetItem",
+                    "dynamodb:Query",
+                    "dynamodb:UpdateItem"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Join": [
+                        "",
+                        [
+                          "arn:aws:dynamodb",
+                          ":",
+                          {
+                            "Ref": "AWS::Region"
+                          },
+                          ":",
+                          {
+                            "Ref": "AWS::AccountId"
+                          },
+                          ":",
+                          "table/",
+                          {
+                            "Ref": "UsersTableName"
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "GetRoundfromTable",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "dynamodb:GetItem"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Join": [
+                        "",
+                        [
+                          "arn:aws:dynamodb",
+                          ":",
+                          {
+                            "Ref": "AWS::Region"
+                          },
+                          ":",
+                          {
+                            "Ref": "AWS::AccountId"
+                          },
+                          ":",
+                          "table/",
+                          {
+                            "Ref": "RoundsTableName"
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "GetTicketfromTable",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "dynamodb:GetItem",
+                    "dynamodb:PutItem",
+                    "dynamodb:Query"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Join": [
+                        "",
+                        [
+                          "arn:aws:dynamodb",
+                          ":",
+                          {
+                            "Ref": "AWS::Region"
+                          },
+                          ":",
+                          {
+                            "Ref": "AWS::AccountId"
+                          },
+                          ":",
+                          "table/",
+                          {
+                            "Ref": "TicketsTableName"
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "Metadata": {
+        "AWS::CloudFormation::Designer": {
+          "id": "c3720f8e-1157-4af9-9112-36af60b29bf2"
+        }
+      }
+    },
+    "ChatBot": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "FunctionName": "ChatBot",
+        "Code": {
+          "S3Bucket": {
+            "Ref": "CodeS3Bucket"
+          },
+          "S3Key": {
+            "Ref": "CodeChatBot"
+          }
+        },
+        "Environment": {
+          "Variables": {
+            "TicketsTableName": {
+              "Ref": "TicketsTableName"
+            },
+            "RoundsTableName": {
+              "Ref": "RoundsTableName"
+            },
+            "RewardsTableName": {
+              "Ref": "RewardsTableName"
+            },
+            "ItemsTableName": {
+              "Ref": "ItemsTableName"
+            },
+            "UsersTableName": {
+              "Ref": "UsersTableName"
+            }
+          }
+        },
+        "Description": "generic hanlder",
+        "Handler": "index.handler",
+        "MemorySize": 128,
+        "Role": {
+          "Fn::GetAtt": [
+            "ChatBotRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs4.3",
+        "Timeout": 30
+      },
+      "Metadata": {
+        "AWS::CloudFormation::Designer": {
+          "id": "bff5d0e5-b281-4be8-9f07-bccf7ba1b073"
+        }
+      }
     }
   },
   "Metadata": {
@@ -2199,6 +2402,38 @@
         "embeds": [],
         "isrelatedto": [
           "e2f3dd43-b448-4673-8d3d-53466960f182"
+        ]
+      },
+      "c3720f8e-1157-4af9-9112-36af60b29bf2": {
+        "size": {
+          "width": 60,
+          "height": 60
+        },
+        "position": {
+          "x": 70,
+          "y": 420
+        },
+        "z": 1,
+        "embeds": [],
+        "isrelatedto": [
+          "e2f3dd43-b448-4673-8d3d-53466960f182"
+        ]
+      },
+      "bff5d0e5-b281-4be8-9f07-bccf7ba1b073": {
+        "size": {
+          "width": 60,
+          "height": 60
+        },
+        "position": {
+          "x": 190,
+          "y": 420
+        },
+        "z": 1,
+        "embeds": [],
+        "isrelatedto": [
+          "ca1f96a9-87e2-4547-8db6-9a2a91f82276",
+          "698c3a41-29be-46e4-831f-1be5b855a623",
+          "c3720f8e-1157-4af9-9112-36af60b29bf2"
         ]
       }
     }

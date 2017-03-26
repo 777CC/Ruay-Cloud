@@ -37,6 +37,9 @@
 //console.log('Loading function');
 const doc = require('dynamodb-doc');
 const dynamo = new doc.DynamoDB();
+const url = require('url');
+const path = require("path");
+//const URL = require('url-parse');
 const request = require('request');
 const https = require('https');
 var PAGE_ACCESS_TOKEN;
@@ -137,9 +140,40 @@ function checkMessage(senderId,message) {
         //if (user) {
         //    respond(senderId, CONFIG.replyOrderaAgain);
         //}
-        console.log("message === CONFIG.okey : " + message);
-        getData(process.env.UsersTableName, "facebookId", senderId, function (err, data) {
-            respond(senderId, "Hello : " + JSON.stringify(data));
+
+        //console.log("message === CONFIG.okey : " + message);
+        //getData(process.env.UsersTableName, "facebookId", senderId, function (err, data) {
+        //    respond(senderId, "Hello : " + JSON.stringify(data));
+        //});
+        //https://graph.facebook.com/v2.6/<USER_ID>?fields=first_name,last_name,profile_pic,locale,timezone,gender&access_token=<PAGE_ACCESS_TOKEN>
+        request({
+            uri: 'https://graph.facebook.com/v2.6/' + senderId,
+            qs: {
+                access_token: PAGE_ACCESS_TOKEN,
+                appsecret_proof: APPSECRET_PROOF,
+                fields: 'profile_pic'
+            },
+            method: 'GET'
+        }, function (error, response, body) {
+            //console.log(JSON.stringify(response));
+            if (!error && response.statusCode == 200) {
+                //var profile_pic = body.profile_pic;
+                //console.log(JSON.stringify(body));
+                //console.log(JSON.stringify(response.body));
+                var bodyObj = JSON.parse(body);
+                var picPath = url.parse(bodyObj.profile_pic).pathname;
+                var fbProfilePicture = path.basename(picPath);
+                //var profile_pic = URL.pathname.replace(/(^\/|\/$)/g, ''); // "someFile.txt"
+                console.log(fbProfilePicture);
+                getUser(fbProfilePicture, function (err, data) {
+                    console.log("getData : " + JSON.stringify(data));
+                    respond(senderId, "Hello : " + JSON.stringify(data));
+                });
+            }
+            else {
+                console.log("FB profile photo request error : ", JSON.stringify(response));
+                callback();
+            }
         });
     } else if (message == config.randomAgain) {
         //read and update userInfo
@@ -165,8 +199,9 @@ var respond = function respond(recipientId, textMessage, imageUrl) {
                     template_type: "generic",
                     elements: [{
                         title: textMessage,
-                        image_url: imageUrl,
-                        subtitle: textMessage
+                        image_url: imageUrl
+                        //image_url: imageUrl,
+                        //subtitle: textMessage
                     }]
                 }
             }
@@ -221,16 +256,43 @@ var respond = function respond(recipientId, textMessage, imageUrl) {
     });
 }
 
-function getData(tableName, keyName, id, callback) {
-    var params = {}
-    params.TableName = tableName;
-    params["Key"] = {};
-    params.Key[keyName] = id;
-    dynamo.getItem(params, function (err, data) {
+function getUser(id, callback) {
+    var params = {
+        TableName: process.env.UsersTableName,
+        IndexName: "fbProfilePicture-index",
+        ProjectionExpression: "id, facebookId, satang",
+        KeyConditionExpression: "fbProfilePicture = :fb",
+        //FilterExpression: "roundId = :roundId",
+        ExpressionAttributeValues: {
+            ":fb": id
+            //":roundId": roundId
+        }
+    };
+    console.log("query : ", JSON.stringify(params));
+    dynamo.query(params, function (err, data) {
         if (err) {
-            callback("Error getData : " + keyName + " : " + JSON.stringify(err, null, 2));
+            callback("Error getData : " + JSON.stringify(err, null, 2));
         }
         else {
+            callback(null, data);
+        }
+    });
+}
+function getTickets(userId, roundId, callback) {
+    var params = {
+        TableName: process.env.TicketsTableName,
+        ProjectionExpression: "createdOn, roundId, reserveNumber, amount, announced",
+        KeyConditionExpression: "ownerId = :ownerId",
+        FilterExpression: "roundId = :roundId",
+        ExpressionAttributeValues: {
+            ":ownerId": userId,
+            ":roundId": roundId
+        }
+    };
+    dynamo.query(params, function (err, data) {
+        if (err) {
+            callback("Error getTickets : " + JSON.stringify(err, null, 2));
+        } else {
             callback(null, data);
         }
     });

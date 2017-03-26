@@ -2,7 +2,7 @@
 const doc = require('dynamodb-doc');
 const dynamo = new doc.DynamoDB();
 const async = require('async');
-const userDataKeys = ['firstName', 'lastName', 'phoneNumber', 'birthday', 'gender', 'zodiac', 'interests' ];
+const userDataKeys = ['fbProfilePicture','firstName', 'lastName', 'phoneNumber', 'birthday', 'gender', 'zodiac', 'interests' ];
 const registerReward = 99;
 const nextDailyRewardValue = 40;
 const inviteReward = 500;
