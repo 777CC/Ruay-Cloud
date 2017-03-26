@@ -165,9 +165,12 @@ function checkMessage(senderId,message) {
                 var fbProfilePicture = path.basename(picPath);
                 //var profile_pic = URL.pathname.replace(/(^\/|\/$)/g, ''); // "someFile.txt"
                 console.log(fbProfilePicture);
-                getUser(fbProfilePicture, function (err, data) {
+                //getUser(fbProfilePicture, function (err, data) {
+                //    console.log("getData : " + JSON.stringify(data));
+                //    respond(senderId, "Hello : " + JSON.stringify(data));
+                //});
+                getTickets("test", "A20170101", function (err, data) {
                     console.log("getData : " + JSON.stringify(data));
-                    respond(senderId, "Hello : " + JSON.stringify(data));
                 });
             }
             else {
@@ -259,17 +262,29 @@ var respond = function respond(recipientId, textMessage, imageUrl) {
 function getUser(id, callback) {
     var params = {
         TableName: process.env.UsersTableName,
+        //TableName: process.env.TicketsTableName,
         IndexName: "fbProfilePicture-index",
         ProjectionExpression: "id, facebookId, satang",
-        KeyConditionExpression: "fbProfilePicture = :fb",
+        //KeyConditionExpression: "fbProfilePicture = :fb",
+        KeyConditions: { // indexed attributes to query
+            // must include the hash key value of the table or index 
+            // with 'EQ' operator
+            fbProfilePicture: {
+                ComparisonOperator: 'EQ', // (EQ | NE | IN | LE | LT | GE | GT | BETWEEN | 
+                //  NOT_NULL | NULL | CONTAINS | NOT_CONTAINS | BEGINS_WITH)
+                AttributeValueList: [{ S: id }]
+            },
+            // more key conditions ...
+        },
         //FilterExpression: "roundId = :roundId",
-        ExpressionAttributeValues: {
-            ":fb": id
+        //ExpressionAttributeValues: {
+          //  ":fb": id
             //":roundId": roundId
-        }
+        //}
     };
-    console.log("query : ", JSON.stringify(params));
+    
     dynamo.query(params, function (err, data) {
+        console.log("query : ", JSON.stringify(data));
         if (err) {
             callback("Error getData : " + JSON.stringify(err, null, 2));
         }
@@ -280,13 +295,14 @@ function getUser(id, callback) {
 }
 function getTickets(userId, roundId, callback) {
     var params = {
-        TableName: process.env.TicketsTableName,
-        ProjectionExpression: "createdOn, roundId, reserveNumber, amount, announced",
-        KeyConditionExpression: "ownerId = :ownerId",
-        FilterExpression: "roundId = :roundId",
+        TableName: process.env.UsersTableName,
+        IndexName: "fbProfilePicture-index",
+        ProjectionExpression: "createdOn, facebookId",
+        KeyConditionExpression: "fbProfilePicture = :ownerId",
+        //FilterExpression: "roundId = :roundId",
         ExpressionAttributeValues: {
-            ":ownerId": userId,
-            ":roundId": roundId
+            ":ownerId": userId
+          //  ":roundId": roundId
         }
     };
     dynamo.query(params, function (err, data) {
