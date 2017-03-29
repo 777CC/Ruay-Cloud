@@ -37,7 +37,6 @@
   <ItemGroup>
     <Compile Include="index.js" />
     <Compile Include="config.json" />
-    <Compile Include="Queue.js" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsTools.targets" />
 </Project>

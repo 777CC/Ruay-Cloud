@@ -100,7 +100,7 @@ function updateInfo(userId, payValue, callback) {
 	}
 	dynamo.updateItem(params, function (err, data) {
 		if (err) {
-			callback("Error buy ticket : " + JSON.stringify(err, null, 2));
+            callback("Error updateInfo : " + JSON.stringify(err, null, 2));
 		} else {
 			callback(null, data);
 		}
