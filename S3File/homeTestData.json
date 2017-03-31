@@ -1,38 +1,55 @@
 {
-  "androidAdUnitId": "ca-app-pub-4416122709352572/4608987845",
-  "iosAdUnitId": "ca-app-pub-4416122709352572/4608987845",
+  "androidAdUnitId": "ca-app-pub-4416122709352572/8828863444",
+  "iosAdUnitId": "ca-app-pub-4416122709352572/7072928649",
   "pages": [
     {
       "id": "Home",
       "title": "รวย",
       "cards": [
         {
+          "title": "ส่งข้อความ",
+          "actionType": "OpenURL",
+          "actionValue": "http://m.me/ruayapp",
+          "viewType": "8"
+        },
+        {
           "title": "งวด 1 เม.ย. 60",
           "photo": "RoundA20170401.jpg",
-          "nextPage": "RoundA20170401",
+          "actionType": "Round",
+          "actionValue": "A20170416",
           "viewType": "1",
           "startTime": "1489586800000",
           "endTime": "1491022800000"
         },
         {
-          "title": "แลกของขวัญ",
-          "nextPage": "Shop",
-          "photo": "Shop20170315.jpg",
+          "title": "เกม e-ใบตอง",
+          "actionType": "",
+          "actionValue": "",
+          "photo": "ComingSoonEbitoeyGame.jpg",
           "viewType": "1"
         },
         {
           "title": "สลากของคุณ",
-          "nextPage": "MyTickets",
+          "actionType": "ToPage",
+          "actionValue": "MyTickets",
           "viewType": "8"
         },
         {
           "title": "ของขวัญ",
-          "nextPage": "MyRewards",
+          "actionType": "ToPage",
+          "actionValue": "MyRewards",
           "viewType": "8"
         },
         {
           "title": "การตั้งค่า",
-          "nextPage": "Setting",
+          "actionType": "ToPage",
+          "actionValue": "Setting",
+          "viewType": "8"
+        },
+        {
+          "title": "shop",
+          "actionType": "ToPage",
+          "actionValue": "Shop",
           "viewType": "8"
         }
       ]
@@ -42,48 +59,43 @@
       "title": "แลกของขวัญ",
       "cards": [
         {
-          "title": "ของขวัญเข้าเร็วๆนี้ เตรียมสตางค์รอเลยจ้าาา",
-          "nextPage": "",
-          "viewType": "9"
+          "title": "001",
+          "actionType": "Item",
+          "actionValue": "001",
+          "viewType": "8"
+        },
+        {
+          "title": "001",
+          "actionType": "Item",
+          "actionValue": "001",
+          "viewType": "8"
+        },
+        {
+          "title": "002",
+          "actionType": "Item",
+          "actionValue": "002",
+          "viewType": "8"
+        },
+        {
+          "title": "งวด 1 เม.ย. 60",
+          "photo": "RoundA20170401.jpg",
+          "nextPage": "A20170416",
+          "viewType": "1",
+          "startTime": "1489586800000",
+          "endTime": "1491022800000"
         }
       ]
     }
   ],
   "rounds": [
     {
-      "id": "A20170401",
-      "title": "งวด 1 เม.ย. 60",
+      "id": "A20170416",
+      "title": "งวด 16 เม.ย. 60",
       "desc": "รางวัลที่ 1 : iPhone 7\nและสุ่ม 2 รางวัล\nแจกรางวัลล่ะ 1000 บาท\nเลขท้าย3ตัว 20,000 ส.\nเลขท้าย 2 ตัว 2,000 ส.\nสามารถแลกได้ถึงก่อนเที่ยง\nตรงวันประกาศผล",
       "price": "40",
       "amountLimit": "100",
-      "startTime": "1489586800000",
-      "endTime": "1491022800000"
-    },
-    {
-      "id": "B20170101",
-      "title": "เทสสสสสสซ้ำำำำๆๆๆๆๆ",
-      "photo": "string",
-      "desc": "string",
-      "price": "600",
-      "amountLimit": "1",
-      "discountPercent": "%",
-      "discountprice": "100",
-      "expireDate": "",
-      "startDate": "",
-      "choices": [
-        {
-          "choiceName": "แมนยู",
-          "choiceValue": "1"
-        },
-        {
-          "choiceName": "fdas",
-          "choiceValue": "2"
-        },
-        {
-          "choiceName": "]ดกำดด",
-          "choiceValue": "3"
-        }
-      ]
+      "startTime": "1490914280000",
+      "endTime": "1492318800000"
     }
   ],
   "items": [
