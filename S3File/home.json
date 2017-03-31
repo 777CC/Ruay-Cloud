@@ -1,31 +1,82 @@
 {
-  "androidAdUnitId": "ca-app-pub-4416122709352572/4608987845",
-  "iosAdUnitId": "ca-app-pub-4416122709352572/4608987845",
+  "androidAdUnitId": "ca-app-pub-4416122709352572/8828863444",
+  "iosAdUnitId": "ca-app-pub-4416122709352572/7072928649",
   "pages": [
     {
       "id": "Home",
       "title": "รวย",
       "cards": [
         {
+          "title": "งวด 1 เม.ย. 60",
+          "photo": "RoundA20170401.jpg",
+          "actionType": "Round",
+          "actionValue": "A20170401",
+          "viewType": "1",
+          "startTime": "1489586800000",
+          "endTime": "1491022800000"
+        },
+        {
           "title": "เกม e-ใบตอง",
-          "nextPage": "Shop",
+          "actionType": "",
+          "actionValue": "",
           "photo": "ComingSoonEbitoeyGame.jpg",
           "viewType": "1"
         },
         {
           "title": "สลากของคุณ",
-          "nextPage": "MyTickets",
+          "actionType": "ToPage",
+          "actionValue": "MyTickets",
           "viewType": "8"
         },
         {
           "title": "ของขวัญ",
-          "nextPage": "MyRewards",
+          "actionType": "ToPage",
+          "actionValue": "MyRewards",
           "viewType": "8"
         },
         {
           "title": "การตั้งค่า",
-          "nextPage": "Setting",
+          "actionType": "ToPage",
+          "actionValue": "Setting",
           "viewType": "8"
+        },
+        {
+          "title": "shop",
+          "actionType": "ToPage",
+          "actionValue": "Shop",
+          "viewType": "8"
+        }
+      ]
+    },
+    {
+      "id": "Shop",
+      "title": "แลกของขวัญ",
+      "cards": [
+        {
+          "title": "001",
+          "actionType": "Item",
+          "actionValue": "001",
+          "viewType": "8"
+        },
+        {
+          "title": "001",
+          "actionType": "Item",
+          "actionValue": "001",
+          "viewType": "8"
+        },
+        {
+          "title": "002",
+          "actionType": "Item",
+          "actionValue": "002",
+          "viewType": "8"
+        },
+        {
+          "title": "งวด 1 เม.ย. 60",
+          "photo": "RoundA20170401.jpg",
+          "nextPage": "RoundA20170401",
+          "viewType": "1",
+          "startTime": "1489586800000",
+          "endTime": "1491022800000"
         }
       ]
     }
@@ -39,6 +90,56 @@
       "amountLimit": "100",
       "startTime": "1490914280000",
       "endTime": "1492318800000"
+    }
+  ],
+  "items": [
+    {
+      "id": "001",
+      "title": "iPhone 7",
+      "photo": "001.jpg",
+      "desc": "feawfdsafdsafdsafdsafdsafdsa\nfdsafdsafdasfdsaf\nfdasfefdsaf",
+      "price": "2000000",
+      "amountLimit": "1",
+      "discountPercent": "%",
+      "discountprice": "100",
+      "startTime": "1489640401000",
+      "endTime": "1491022800000"
+    },
+    {
+      "id": "002",
+      "title": "Click125",
+      "photo": "002.jpg",
+      "desc": "feawfdsafdsafdsafdsafdsafdsa\nfdsafdsafdasfdsaf\nfdasfefdsaf",
+      "price": "2500000",
+      "discountPercent": "%",
+      "discountprice": "100",
+      "startTime": "1489640401000",
+      "endTime": "1491022800000"
+    },
+    {
+      "id": "003",
+      "title": "Huawei GR5",
+      "photo": "003.jpg",
+      "choices": [
+        {
+          "choiceName": "สีแดง",
+          "choiceValue": "1"
+        },
+        {
+          "choiceName": "สีดำ",
+          "choiceValue": "2"
+        },
+        {
+          "choiceName": "สีดำ",
+          "choiceValue": "3"
+        }
+      ],
+      "desc": "feawfdsafdsafdsafdsafdsafdsa\nfdsafdsafdasfdsaf\nfdasfefdsaf",
+      "price": "2000000",
+      "discountPercent": "%",
+      "discountprice": "100",
+      "startTime": "1489640401000",
+      "endTime": "1491022800000"
     }
   ]
 }
