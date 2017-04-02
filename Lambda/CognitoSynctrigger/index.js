@@ -37,8 +37,7 @@ function getNextDailyRewardTime() {
 	var today = new Date();
 	//if(20 < 21)
     var tomorrow;
-
-    console.log("Now : " + Date.now() +" hour : " + today.getUTCHours() + " : " + (Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate(), 21) + 86400000));
+    //console.log("Now : " + Date.now() +" hour : " + today.getUTCHours() + " : " + (Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate(), 21) + 86400000));
 	if (today.getUTCHours() > 21) {
 		//86400000 is unix timestamp per day.
 		tomorrow = Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate(), 21) + 86400000;
@@ -192,7 +191,7 @@ function updateUserInfo(callback, oldData, modifiedEvent) {
 				oldData.inviteBy = oldData.inviteBy;
 			}
 		}
-		if (isUpdate) {
+        if (isUpdate) {
 			updateUserDB(userParams, callback);
 		} else {
 			callback();
@@ -239,9 +238,12 @@ function getIdfromInviteName(isUpdate,params, modifiedEvent, callback) {
 	});
 }
 function updateUserDB(params, callback) {
+    console.log("updateUserDB : " + JSON.stringify(data));
 	//delete , from UpdateExpression.
 	params.UpdateExpression = params.UpdateExpression.substring(0, params.UpdateExpression.length - 2);
-	dynamo.updateItem(params, function (err, data) {
+    params.ReturnValues = "UPDATED_NEW";
+    dynamo.updateItem(params, function (err, data) {
+        console.log("updateUserDB : " + JSON.stringify(data));
 		callback(err);
 	});
 }
