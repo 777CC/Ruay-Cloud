@@ -32,11 +32,13 @@ function editRecord(dataset, key, data) {
 		};
 	}
 }
-function nextDailyRewardTime() {
+function getNextDailyRewardTime() {
 	//next day is after 4 o'clock in the morning.
 	var today = new Date();
 	//if(20 < 21)
-	var tomorrow;
+    var tomorrow;
+
+    console.log("Now : " + Date.now() +" hour : " + today.getUTCHours() + " : " + (Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate(), 21) + 86400000));
 	if (today.getUTCHours() > 21) {
 		//86400000 is unix timestamp per day.
 		tomorrow = Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate(), 21) + 86400000;
@@ -122,7 +124,7 @@ function addUser(callback,modifiedEvent){
         "id": modifiedEvent.identityId,
         "createdOn":Date.now(),
 		"updateTime": Date.now(),
-		"nextDailyRewardTime": nextDailyRewardTime(),
+		"nextDailyRewardTime": getNextDailyRewardTime(),
         "satang": registerReward
     };
     
@@ -175,7 +177,7 @@ function updateUserInfo(callback, oldData, modifiedEvent) {
 		isUpdate = true;
 		userParams.UpdateExpression += "satang = satang + :reward, nextDailyRewardTime = :nextDailyRewardTime, ";
 		userParams.ExpressionAttributeValues[":reward"] = nextDailyRewardValue;
-		userParams.ExpressionAttributeValues[":nextDailyRewardTime"] = nextDailyRewardTime();
+		userParams.ExpressionAttributeValues[":nextDailyRewardTime"] = getNextDailyRewardTime();
 		editRecord(modifiedEvent, "satang", oldData.satang + nextDailyRewardValue);
 	} else {
 		editRecord(modifiedEvent, "satang", oldData.satang);

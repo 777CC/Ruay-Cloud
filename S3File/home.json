@@ -20,6 +20,15 @@
           "viewType": "8"
         },
         {
+          "title": "งวด 16 เม.ย. 60",
+          "actionType": "Round",
+          "actionValue": "A20170416",
+          "viewType": "1",
+          "photo": "Round20170416.jpg",
+          "startTime": "1490914280000",
+          "endTime": "1492318800000"
+        },
+        {
           "title": "สลากของคุณ",
           "actionType": "ToPage",
           "actionValue": "MyTickets",
@@ -44,7 +53,6 @@
     {
       "id": "A20170416",
       "title": "งวด 16 เม.ย. 60",
-      "desc": "รางวัลที่ 1 : iPhone 7\nและสุ่ม 2 รางวัล\nแจกรางวัลล่ะ 1000 บาท\nเลขท้าย3ตัว 20,000 ส.\nเลขท้าย 2 ตัว 2,000 ส.\nสามารถแลกได้ถึงก่อนเที่ยง\nตรงวันประกาศผล",
       "price": "40",
       "amountLimit": "100",
       "startTime": "1490914280000",
