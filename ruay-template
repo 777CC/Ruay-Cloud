@@ -66,11 +66,6 @@
       "Type": "String",
       "Default": "Users"
     },
-    "InviteNamesTableName": {
-      "Description": "The name of table in Dynamodb which is inviteName.",
-      "Type": "String",
-      "Default": "InviteNames"
-    },
     "RoundsTableName": {
       "Description": "The name of  table in Dynamodb which is rounds.",
       "Type": "String",
@@ -797,9 +792,6 @@
             },
             "UsersTableName": {
               "Ref": "UsersTableName"
-            },
-            "InviteNamesTableName": {
-              "Ref": "InviteNamesTableName"
             }
           }
         },
@@ -895,43 +887,6 @@
             }
           },
           {
-            "PolicyName": "GetInviteNamefromTable",
-            "PolicyDocument": {
-              "Version": "2012-10-17",
-              "Statement": [
-                {
-                  "Effect": "Allow",
-                  "Action": [
-                    "dynamodb:GetItem"
-                  ],
-                  "Resource": [
-                    {
-                      "Fn::Join": [
-                        "",
-                        [
-                          "arn:aws:dynamodb",
-                          ":",
-                          {
-                            "Ref": "AWS::Region"
-                          },
-                          ":",
-                          {
-                            "Ref": "AWS::AccountId"
-                          },
-                          ":",
-                          "table/",
-                          {
-                            "Ref": "InviteNamesTableName"
-                          }
-                        ]
-                      ]
-                    }
-                  ]
-                }
-              ]
-            }
-          },
-          {
             "PolicyName": "GetTicketfromTable",
             "PolicyDocument": {
               "Version": "2012-10-17",
@@ -997,6 +952,44 @@
                           {
                             "Ref": "RewardsTableName"
                           }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "GetInviteName",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "dynamodb:Query"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Join": [
+                        "",
+                        [
+                          "arn:aws:dynamodb",
+                          ":",
+                          {
+                            "Ref": "AWS::Region"
+                          },
+                          ":",
+                          {
+                            "Ref": "AWS::AccountId"
+                          },
+                          ":",
+                          "table/",
+                          {
+                            "Ref": "UsersTableName"
+                          },
+                          "/index/inviteName-index"
                         ]
                       ]
                     }
@@ -1128,6 +1121,10 @@
           {
             "AttributeName": "fbProfilePicture",
             "AttributeType": "S"
+          },
+          {
+            "AttributeName": "inviteName",
+            "AttributeType": "S"
           }
         ],
         "KeySchema": [
@@ -1149,6 +1146,22 @@
             "KeySchema": [
               {
                 "AttributeName": "fbProfilePicture",
+                "KeyType": "HASH"
+              }
+            ],
+            "Projection": {
+              "ProjectionType": "ALL"
+            },
+            "ProvisionedThroughput": {
+              "ReadCapacityUnits": "1",
+              "WriteCapacityUnits": "1"
+            }
+          },
+          {
+            "IndexName": "inviteName-index",
+            "KeySchema": [
+              {
+                "AttributeName": "inviteName",
                 "KeyType": "HASH"
               }
             ],
@@ -1425,35 +1438,6 @@
         }
       }
     },
-    "InviteNames": {
-      "Type": "AWS::DynamoDB::Table",
-      "Properties": {
-        "AttributeDefinitions": [
-          {
-            "AttributeName": "inviteName",
-            "AttributeType": "S"
-          }
-        ],
-        "KeySchema": [
-          {
-            "AttributeName": "inviteName",
-            "KeyType": "HASH"
-          }
-        ],
-        "TableName": {
-          "Ref": "InviteNamesTableName"
-        },
-        "ProvisionedThroughput": {
-          "ReadCapacityUnits": "1",
-          "WriteCapacityUnits": "1"
-        }
-      },
-      "Metadata": {
-        "AWS::CloudFormation::Designer": {
-          "id": "c0737172-2fbe-4e9c-856d-ed91899287e1"
-        }
-      }
-    },
     "SetInviteName": {
       "Type": "AWS::Lambda::Function",
       "Properties": {
@@ -1468,8 +1452,8 @@
         },
         "Environment": {
           "Variables": {
-            "InviteNamesTableName": {
-              "Ref": "InviteNamesTableName"
+            "UsersTableName": {
+              "Ref": "UsersTableName"
             }
           }
         },
@@ -1526,16 +1510,15 @@
             }
           },
           {
-            "PolicyName": "GetInviteNamefromTable",
+            "PolicyName": "GetUserfromTable",
             "PolicyDocument": {
               "Version": "2012-10-17",
               "Statement": [
                 {
                   "Effect": "Allow",
                   "Action": [
-                    "dynamodb:PutItem",
-                    "dynamodb:Scan",
-                    "dynamodb:DeleteItem"
+                    "dynamodb:GetItem",
+                    "dynamodb:UpdateItem"
                   ],
                   "Resource": [
                     {
@@ -1554,8 +1537,46 @@
                           ":",
                           "table/",
                           {
-                            "Ref": "InviteNamesTableName"
+                            "Ref": "UsersTableName"
                           }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "GetInviteName",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "dynamodb:Query"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Join": [
+                        "",
+                        [
+                          "arn:aws:dynamodb",
+                          ":",
+                          {
+                            "Ref": "AWS::Region"
+                          },
+                          ":",
+                          {
+                            "Ref": "AWS::AccountId"
+                          },
+                          ":",
+                          "table/",
+                          {
+                            "Ref": "UsersTableName"
+                          },
+                          "/index/inviteName-index"
                         ]
                       ]
                     }
@@ -2152,8 +2173,8 @@
           "height": 60
         },
         "position": {
-          "x": 50,
-          "y": 190
+          "x": 70,
+          "y": 200
         },
         "z": 1,
         "embeds": [],
@@ -2191,7 +2212,7 @@
           "height": 60
         },
         "position": {
-          "x": 190,
+          "x": 180,
           "y": 350
         },
         "z": 1,
@@ -2207,7 +2228,7 @@
           "height": 60
         },
         "position": {
-          "x": 190,
+          "x": 180,
           "y": 490
         },
         "z": 1,
@@ -2223,7 +2244,7 @@
           "height": 60
         },
         "position": {
-          "x": 60,
+          "x": 70,
           "y": 350
         },
         "z": 1,
@@ -2302,7 +2323,7 @@
           "height": 60
         },
         "position": {
-          "x": 190,
+          "x": 180,
           "y": 590
         },
         "z": 1,
@@ -2328,18 +2349,6 @@
           "e2f3dd43-b448-4673-8d3d-53466960f182"
         ]
       },
-      "c0737172-2fbe-4e9c-856d-ed91899287e1": {
-        "size": {
-          "width": 60,
-          "height": 60
-        },
-        "position": {
-          "x": -80,
-          "y": 660
-        },
-        "z": 1,
-        "embeds": []
-      },
       "c43c6002-e7dc-4a55-928f-55b32af06873": {
         "size": {
           "width": 60,
@@ -2363,7 +2372,7 @@
           "height": 60
         },
         "position": {
-          "x": 60,
+          "x": 70,
           "y": 270
         },
         "z": 1,
@@ -2379,7 +2388,7 @@
           "height": 60
         },
         "position": {
-          "x": 190,
+          "x": 180,
           "y": 690
         },
         "z": 1,
@@ -2413,7 +2422,7 @@
           "height": 60
         },
         "position": {
-          "x": 190,
+          "x": 180,
           "y": 770
         },
         "z": 1,
@@ -2463,7 +2472,7 @@
           "height": 60
         },
         "position": {
-          "x": 190,
+          "x": 180,
           "y": 420
         },
         "z": 1,
