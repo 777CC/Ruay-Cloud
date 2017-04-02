@@ -7,10 +7,6 @@
   "updateTimeCount": "0",
   "appInterests": [
     {
-      "name": "cosplay",
-      "value": "cosplay"
-    },
-    {
       "name": "ดูดวง",
       "value": "horoscope"
     },
@@ -37,6 +33,10 @@
     {
       "name": "การ์ตูน",
       "value": "cartoon"
+    },
+    {
+      "name": "cosplay",
+      "value": "cosplay"
     },
     {
       "name": "ทำอาหาร",
