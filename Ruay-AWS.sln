@@ -1,0 +1,64 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26228.9
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Cloudformation", "Cloudformation", "{ABF34F55-E9A6-4D01-801D-E1057454EB4D}"
+	ProjectSection(SolutionItems) = preProject
+		ConfigLambdaEnvironmentvariable-template = ConfigLambdaEnvironmentvariable-template
+		ruay-template = ruay-template
+	EndProjectSection
+EndProject
+Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "BuyReward", "Lambda\BuyReward\BuyReward.njsproj", "{976E5618-D89E-4AD0-9DBE-51A3A1595D33}"
+EndProject
+Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "BuyTicket", "Lambda\BuyTicket\BuyTicket.njsproj", "{93A99353-34B5-47FA-87C9-63D274E18909}"
+EndProject
+Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "ChatBot", "Lambda\ChatBot\ChatBot.njsproj", "{71573173-D1D9-4368-B6F8-A77C1A7C5E0F}"
+EndProject
+Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "CognitoSynctrigger", "Lambda\CognitoSynctrigger\CognitoSynctrigger.njsproj", "{EC174C52-3CDD-4643-A935-E2F404AE378B}"
+EndProject
+Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "DynamicDynamoDB", "Lambda\DynamicDynamoDB\DynamicDynamoDB.njsproj", "{7BAE3EBE-494D-402B-BF32-F1C15CC7C7B3}"
+EndProject
+Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "RoundAnnouncement", "Lambda\RoundAnnouncement\RoundAnnouncement.njsproj", "{44A1C988-F6F3-439D-82AF-E39F19F33DC1}"
+EndProject
+Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "SetInviteName", "Lambda\SetInviteName\SetInviteName.njsproj", "{E3B28FC3-164C-4CA7-B71C-6B39BF35BF13}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{976E5618-D89E-4AD0-9DBE-51A3A1595D33}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{976E5618-D89E-4AD0-9DBE-51A3A1595D33}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{976E5618-D89E-4AD0-9DBE-51A3A1595D33}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{976E5618-D89E-4AD0-9DBE-51A3A1595D33}.Release|Any CPU.Build.0 = Release|Any CPU
+		{93A99353-34B5-47FA-87C9-63D274E18909}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{93A99353-34B5-47FA-87C9-63D274E18909}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{93A99353-34B5-47FA-87C9-63D274E18909}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{93A99353-34B5-47FA-87C9-63D274E18909}.Release|Any CPU.Build.0 = Release|Any CPU
+		{71573173-D1D9-4368-B6F8-A77C1A7C5E0F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{71573173-D1D9-4368-B6F8-A77C1A7C5E0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{71573173-D1D9-4368-B6F8-A77C1A7C5E0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{71573173-D1D9-4368-B6F8-A77C1A7C5E0F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC174C52-3CDD-4643-A935-E2F404AE378B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC174C52-3CDD-4643-A935-E2F404AE378B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC174C52-3CDD-4643-A935-E2F404AE378B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC174C52-3CDD-4643-A935-E2F404AE378B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7BAE3EBE-494D-402B-BF32-F1C15CC7C7B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7BAE3EBE-494D-402B-BF32-F1C15CC7C7B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7BAE3EBE-494D-402B-BF32-F1C15CC7C7B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7BAE3EBE-494D-402B-BF32-F1C15CC7C7B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{44A1C988-F6F3-439D-82AF-E39F19F33DC1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{44A1C988-F6F3-439D-82AF-E39F19F33DC1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{44A1C988-F6F3-439D-82AF-E39F19F33DC1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{44A1C988-F6F3-439D-82AF-E39F19F33DC1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E3B28FC3-164C-4CA7-B71C-6B39BF35BF13}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E3B28FC3-164C-4CA7-B71C-6B39BF35BF13}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E3B28FC3-164C-4CA7-B71C-6B39BF35BF13}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E3B28FC3-164C-4CA7-B71C-6B39BF35BF13}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
