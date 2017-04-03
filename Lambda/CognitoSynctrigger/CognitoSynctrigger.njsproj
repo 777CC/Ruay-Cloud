@@ -38,5 +38,8 @@
   <ItemGroup>
     <Compile Include="index.js" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="package.json" />
+  </ItemGroup>
   <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsTools.targets" />
 </Project>

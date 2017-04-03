@@ -8,6 +8,7 @@ const nextDailyRewardValue = 40;
 const inviteReward = 500;
 exports.handler = function (event, context, callback) {
     // Check for the event type
+    console.log("Before : " + JSON.stringify(event));
     if (event.eventType === 'SyncTrigger') {
 		if ('updateTime' in event.datasetRecords) {
 			async.parallel({
@@ -18,7 +19,7 @@ exports.handler = function (event, context, callback) {
 				if (err) return console.error(JSON.stringify(err, null, 2));
 				editRecord(event, 'rewards', JSON.stringify(results.reward));
 				editRecord(event, 'tickets', JSON.stringify(results.ticket));
-				console.log(JSON.stringify(event));
+				console.log("Result : " + JSON.stringify(event));
 				context.done(null, event);
 			});
 		}
@@ -95,23 +96,23 @@ function getUserReward(id, callback){
                     });
 }
 function getUserInfo(modifiedEvent, callback) {
-	dynamo.getItem(
-		{
-			"TableName": process.env.UsersTableName,
-			"Key": { "id" : modifiedEvent.identityId }
-		}
-                    , function (err, data) {
-			if (err) {
-				console.log("getUserInfo : " + JSON.stringify(err));
-			}
-                        //length === 0 for not registered user.
-			else if (Object.keys(data).length === 0) {
-				addUser(callback, modifiedEvent);
-			}
-			else {
-				updateUserInfo(callback, data.Item, modifiedEvent);
-			}
-		});
+    dynamo.getItem(
+        {
+            "TableName": process.env.UsersTableName,
+            "Key": { "id": modifiedEvent.identityId }
+        }
+        , function (err, data) {
+            if (err) {
+                console.log("getUserInfo : " + JSON.stringify(err));
+            }
+            //length === 0 for not registered user.
+            else if (Object.keys(data).length === 0) {
+                addUser(callback, modifiedEvent);
+            }
+            else {
+                updateUserInfo(callback, data.Item, modifiedEvent);
+            }
+        });
 }
 function addUser(callback,modifiedEvent){
     //"ticket": dynamo.Set(["fdsafdsafdsa","fdsafdasfdasf"], "S")
@@ -181,69 +182,89 @@ function updateUserInfo(callback, oldData, modifiedEvent) {
 	} else {
 		editRecord(modifiedEvent, "satang", oldData.satang);
 	}
+    editRecord(modifiedEvent, "inviteName", oldData.inviteName);
 
-	//Check and give invite reward.
-	if (!oldData.inviteBy && modifiedEvent.datasetRecords.inviteBy && modifiedEvent.datasetRecords.inviteBy.newValue && modifiedEvent.datasetRecords.inviteBy.newValue.length > 0) {
+    //Check and give invite reward.
+    console.log(oldData.inviteBy + " : " + JSON.stringify(modifiedEvent));
+    if (!oldData.inviteBy && modifiedEvent.datasetRecords.inviteBy && modifiedEvent.datasetRecords.inviteBy.newValue && modifiedEvent.datasetRecords.inviteBy.newValue.length > 0) {
+        console.log("getIdfromInviteName");
 		getIdfromInviteName(isUpdate, userParams, modifiedEvent, callback);
 	} else {
-		if (oldData.inviteBy && modifiedEvent.datasetRecords.inviteBy) {
-			if (modifiedEvent.datasetRecords.inviteBy.newValue && modifiedEvent.datasetRecords.inviteBy.newValue.length > 0) { 
-				oldData.inviteBy = oldData.inviteBy;
+        if (oldData.inviteBy && modifiedEvent.datasetRecords.inviteBy) {
+            if (modifiedEvent.datasetRecords.inviteBy.newValue && modifiedEvent.datasetRecords.inviteBy.newValue.length > 0) { 
+                oldData.inviteBy = oldData.inviteBy;
 			}
 		}
         if (isUpdate) {
+            console.log("updateUserDB");
 			updateUserDB(userParams, callback);
-		} else {
+        } else {
+            console.log("NotUpdate");
 			callback();
 		}
 	}
 }
-function getIdfromInviteName(isUpdate,params, modifiedEvent, callback) {
-	dynamo.getItem({
-			"TableName": process.env.InviteNamesTableName,
-			"Key": { "inviteName" : modifiedEvent.datasetRecords.inviteBy.newValue }
-		}, function (err, data) {
-		if (err) {
-			console.log("inviteName err : " + JSON.stringify(err, null, 2));
-			callback(err);
-		} else if (Object.keys(data).length === 0) {//length === 0 for not registered user.
-			modifiedEvent.datasetRecords.inviteBy.op = 'remove';
-			console.log("inviteName length0 :" + JSON.stringify(modifiedEvent, null, 2));
-			if (isUpdate) {
-				updateUserDB(params, callback);
-			} else {
-				callback();
-			}
-		} else {
-			console.log("inviteName ok :" + JSON.stringify(data, null, 2));
-			var inviteParams = {
-				TableName: process.env.UsersTableName,
-				Key: {
-					"id" : data.Item.ownerId
-				},
-				UpdateExpression : "set satang = satang + :reward, ",
-				ExpressionAttributeValues: {
-					":reward": inviteReward
-				}
-			};
-			params.UpdateExpression += "inviteBy = :inviteBy, ";
-			params.ExpressionAttributeValues[":inviteBy"] = modifiedEvent.datasetRecords.inviteBy.newValue;
-			async.parallel({
-				invite: updateUserDB.bind(null, inviteParams),
-				user: updateUserDB.bind(null, params)
-			}, function (err, results) {
-				callback(err);
-			});
-		}
-	});
+function getIdfromInviteName(isUpdate, params, modifiedEvent, callback) {
+    var inviteParams = {
+        TableName: process.env.UsersTableName,
+        IndexName: "inviteName-index",
+        ProjectionExpression: "id",
+        KeyConditionExpression: "inviteName = :ivn",
+        ExpressionAttributeValues: {
+            ":ivn": modifiedEvent.datasetRecords.inviteBy.newValue
+        }
+    };
+    dynamo.query(inviteParams,
+        function (err, data) {
+            if (err) { callback("inviteNameQuery err : " + JSON.stringify(err, null, 2));
+            } else if (Object.keys(data).length > 1 && data.Items && data.Items.length === 1) {//length === 0 for not registered user.
+                console.log("inviteName ok :" + JSON.stringify(data, null, 2));
+                var inviteParams = {
+                    TableName: process.env.UsersTableName,
+                    Key: {
+                        "id": data.Items[0].id
+                    },
+                    UpdateExpression: "set satang = satang + :reward, ",
+                    ExpressionAttributeValues: {
+                        ":reward": inviteReward
+                    }
+                };
+                params.UpdateExpression += "inviteBy = :inviteBy, ";
+                params.ExpressionAttributeValues[":inviteBy"] = modifiedEvent.datasetRecords.inviteBy.newValue;
+                async.parallel({
+                    invite: updateUserDB.bind(null, inviteParams),
+                    user: updateUserDB.bind(null, params)
+                }, function (err, results) {
+                    callback(err);
+                });
+            } else {
+                //delete (modifiedEvent.datasetRecords.inviteBy);
+                console.log("inviteName length0 :" + JSON.stringify(modifiedEvent, null, 2));
+                //if (modifiedEvent.datasetRecords.inviteBy.oldValue) {
+                modifiedEvent.datasetRecords.inviteBy.newValue = '';
+                modifiedEvent.datasetRecords.inviteBy.op = 'replace';
+                    //modifiedEvent.datasetRecords.inviteBy.op = 'replace';
+                //} else {
+                //    delete (modifiedEvent.datasetRecords.inviteBy);
+                //}
+                if (isUpdate) {
+                    updateUserDB(params, callback);
+                } else {
+                    callback();
+                }
+            }
+        });
 }
 function updateUserDB(params, callback) {
-    console.log("updateUserDB : " + JSON.stringify(data));
+    console.log("updateUserDB : " + JSON.stringify(params));
 	//delete , from UpdateExpression.
 	params.UpdateExpression = params.UpdateExpression.substring(0, params.UpdateExpression.length - 2);
     params.ReturnValues = "UPDATED_NEW";
     dynamo.updateItem(params, function (err, data) {
-        console.log("updateUserDB : " + JSON.stringify(data));
+        if (err) {
+            console.error("updateUserDB : " + JSON.stringify(data));
+        }
+        console.log("updateUserDB complete : " + JSON.stringify(data));
 		callback(err);
 	});
 }
