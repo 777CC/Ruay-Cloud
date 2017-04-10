@@ -2,7 +2,7 @@
 const doc = require('dynamodb-doc');
 const dynamo = new doc.DynamoDB();
 const async = require('async');
-const userDataKeys = ['fbProfilePicture','firstName', 'lastName', 'phoneNumber', 'birthday', 'gender', 'zodiac', 'interests' ];
+const userDataKeys = ['fbProfilePicture','firstName', 'lastName', 'phoneNumber', 'birthday', 'gender', 'interests' ];
 const registerReward = 99;
 const nextDailyRewardValue = 40;
 const inviteReward = 500;
@@ -159,10 +159,6 @@ function updateUserInfo(callback, oldData, modifiedEvent) {
 					userParams.UpdateExpression += "interests = :interests, ";
 					var interests = modifiedEvent.datasetRecords[key].newValue.split('#').filter(function (el) { return el.length !== 0 });
 					userParams.ExpressionAttributeValues[":interests"] = dynamo.Set(interests, "S");
-				}
-				else if (key === 'zodiac') {
-					userParams.UpdateExpression += key + " = :" + key + ", ";
-					userParams.ExpressionAttributeValues[":" + key] = parseInt(modifiedEvent.datasetRecords[key].newValue);
 				}
 				else {
 					userParams.UpdateExpression += key + " = :" + key + ", ";

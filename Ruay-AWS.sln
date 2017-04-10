@@ -23,6 +23,8 @@ Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "RoundAnnouncement", "Lambda
 EndProject
 Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "SetInviteName", "Lambda\SetInviteName\SetInviteName.njsproj", "{E3B28FC3-164C-4CA7-B71C-6B39BF35BF13}"
 EndProject
+Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "DynamoDBBackup", "DynamoDBBackup\DynamoDBBackup.njsproj", "{1B6075D4-369E-43C1-AB49-72D8698EC55E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,6 +59,10 @@ Global
 		{E3B28FC3-164C-4CA7-B71C-6B39BF35BF13}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E3B28FC3-164C-4CA7-B71C-6B39BF35BF13}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E3B28FC3-164C-4CA7-B71C-6B39BF35BF13}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1B6075D4-369E-43C1-AB49-72D8698EC55E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B6075D4-369E-43C1-AB49-72D8698EC55E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B6075D4-369E-43C1-AB49-72D8698EC55E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B6075D4-369E-43C1-AB49-72D8698EC55E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

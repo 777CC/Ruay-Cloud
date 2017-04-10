@@ -1,0 +1,12 @@
+{
+  "name": "dynamo-dbbackup",
+  "version": "0.0.0",
+  "description": "DynamoDBBackup",
+  "main": "app.js",
+  "author": {
+    "name": "chain"
+  },
+  "dependencies": {
+    "dynamo-backup-to-s3": "^0.6.1"
+  }
+}
