@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "202703591745",
+    "firebase_url": "https://ruay-e7fc4.firebaseio.com",
+    "project_id": "ruay-e7fc4",
+    "storage_bucket": "ruay-e7fc4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:202703591745:android:c5ef5a47b2cd8193",
+        "android_client_info": {
+          "package_name": "com.Amaze.Ruay"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "202703591745-b0b7b5v464vjlmni4tphr6lujj6hlki5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDtAE07IA_C5KvfRWRU8jZ4Oo7kV8x_VZU"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
